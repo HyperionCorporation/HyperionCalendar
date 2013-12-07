@@ -47,15 +47,7 @@ namespace Calendar
             }
             else if (signInResult == DialogResult.Cancel)
             {
-                currentDate = DateTime.Now;
-                currentDateFirstOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
-
-                lblMonthYear.Text = getDateString(DateTime.Now);
-                user = new User("Bryan", "Wnt2bsleepin@gmail.com", "sdsdsds", "sdsdsds", 1);
-                currentCalendar = new Calendar(DateTime.Now, this, persistence, user);
-                currentCalendar.buildDataSet(dataGridView1);
-                this.Text = "Calendar";
-               //Application.Exit();
+                Application.Exit();
             }
 
            
@@ -188,8 +180,21 @@ namespace Calendar
 
         private void dataGridView1_CurrentCellChanged(object sender, EventArgs e)
         {
-            String test;
-            test = dataGridView1.CurrentCell.Value.ToString();
+            cmboEvents.Items.Clear();
+            Dictionary<int, Event> events;
+            String day;
+            day = dataGridView1.CurrentCell.Value.ToString();
+            DateTime date;
+           // day = currentDate.Year + "/" + currentDate.Month + "/" + day + " 6:00:00z";
+            String time = "{0}/{1}/{2} 6:00:00z";
+            time = String.Format(time, currentDate.Year, currentDate.Month, day);
+            date = DateTime.Parse(time);
+            events = persistence.GetEvents(user, date);
+            foreach(KeyValuePair<int,Event> myEvent in events)
+            {
+                cmboEvents.Items.Add(myEvent.Value.name);
+            }
         }
+
     }
 }
