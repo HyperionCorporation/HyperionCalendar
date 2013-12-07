@@ -17,7 +17,6 @@ namespace Calendar
         DateTime currentDateFirstOfMonth;
         private Persistence persistence;
         private User user;
-        Dictionary<int, Event> events;
 
 
         public MainForm()
