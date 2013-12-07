@@ -94,16 +94,21 @@ namespace Calendar
             
             if (e.Button == MouseButtons.Right)
             {
-
                 this.ContextMenuStrip = new ContextMenuStrip();
-
-                ToolStripItem viewEvent2 = new ToolStripMenuItem();
-                viewEvent2.Text = "Event";
-                viewEvent2.Name = "view_events2";
-                this.ContextMenuStrip.Items.Add(viewEvent2);
-
-            
+                Dictionary<int, Event> events;
+                events = persistence.GetEvents(user, date);
+                List<ToolStripItem> tsItems = new List<ToolStripItem>();
+                foreach(KeyValuePair<int, Event> myEvent in events)
+                {
+                    ToolStripItem myTSItem = new ToolStripMenuItem();
+                    myTSItem.Text = myEvent.Value.name;
+                    myTSItem.Tag = myEvent.Value;
+                    myTSItem.Click += new System.EventHandler(item_Click);
+                    tsItems.Add(myTSItem);
+                    this.ContextMenuStrip.Items.Add(myTSItem);
+                }
                 
+
                 this.ContextMenuStrip.Items.Add(new ToolStripSeparator());
 
                 this.ContextMenuStrip.Items.Add("Another Setting");
@@ -114,10 +119,17 @@ namespace Calendar
 
         void item_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Events:");
-            foreach (KeyValuePair<int, Event> myEvent in events)
+            ToolStripItem tsItem = sender as ToolStripItem;
+            Event myEvent = tsItem.Tag as Event;
+            Form editEvent = new EventModifier(myEvent, true);
+            DialogResult editEventResult = editEvent.ShowDialog();
+            if (editEventResult == DialogResult.No)
             {
-                Console.WriteLine(myEvent.Value.name + "\n" + myEvent.Value.location);
+                //Delete the event
+                Event deleteEvent = (Event)editEvent.Tag;
+                events.Remove(deleteEvent.Key);
+                persistence.DeleteEvent(deleteEvent);
+                this.DataGridView.InvalidateCell(this);
             }
         }
 
