@@ -158,13 +158,19 @@ namespace Calendar
             {
                 Form editEvent = new EventModifier(exisitingEvent, true);
                 DialogResult editEventResult = editEvent.ShowDialog();
-                if (editEventResult == DialogResult.No)
+                if (editEventResult == DialogResult.No)//
                 {
                     //Delete the event
                     Event deleteEvent = (Event)editEvent.Tag;
                     events.Remove(deleteEvent.Key);
                     persistence.DeleteEvent(deleteEvent);
                     this.DataGridView.InvalidateCell(this);
+                }
+
+                else if (editEventResult == DialogResult.OK)
+                {
+                    Event modifyEvent = (Event)editEvent.Tag;
+                    persistence.EditEvent(modifyEvent, user);
                 }
             }
             

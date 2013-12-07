@@ -21,9 +21,8 @@ To Add the reference in Visual Studio
 
 ###Planned Features
 
-+ Add events to the calendar
 + Events are synced to remote database
-+ User accounts with login
++ View Events with Right Click
 
 ###Currently Implemented Features
 
@@ -31,16 +30,13 @@ To Add the reference in Visual Studio
 + Can create users and log in
 + Calender Generation
 + User information stored in local database
-
++ User accounts with login
++ Add events to the calendar
 
 ###Bugs
 + None right now
 
 ###ToDo
 + Custom calendar cell's rectangles need work
-+ Add Remote Database and sync
 + Add validity checking
-+ Add ability to create and delete events
-+ Add events to database
-+ Clean up how Users are handled, One class/struct only, not 2.
 + Commment code

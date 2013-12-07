@@ -41,6 +41,11 @@ namespace Calendar
             return sqlitePersitance.SaveEvent(myEvent, user);
         }
 
+        public void EditEvent(Event myEvent,User myUser)
+        {
+            sqlitePersitance.EditEvent(myEvent, myUser);
+
+        }
         /// <summary>
         /// Gets the events for a user on a date. 
         /// </summary>
@@ -238,11 +243,22 @@ namespace Calendar
             localDBConnection = new SQLiteConnection("Data Source=" + localDatabase + ";Version=3;");
             localDBConnection.Open();
 
-            SQLiteCommand cmd = localDBConnection.CreateCommand();
-            cmd.CommandType = System.Data.CommandType.Text;
-            cmd.CommandText = PermanentSettings.DELETE_EVENT_SQLITE;
-            cmd.Parameters.Add(new SQLiteParameter("@key",deleteEvent.Key));
-            cmd.ExecuteNonQuery();
+            try
+            {
+                SQLiteCommand cmd = localDBConnection.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = PermanentSettings.DELETE_EVENT_SQLITE;
+                cmd.Parameters.Add(new SQLiteParameter("@key", deleteEvent.Key));
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                localDBConnection.Close();
+                }
         }
 
         /// <summary>
@@ -332,6 +348,37 @@ namespace Calendar
 
         }
 
+
+        public void EditEvent(Event myEvent, User myUser)
+        {
+            try
+            {
+                localDBConnection = new SQLiteConnection("Data Source=" + localDatabase + ";Version=3;");
+                localDBConnection.Open();
+
+                SQLiteCommand cmd = localDBConnection.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = PermanentSettings.UPDATE_EVENT_SQLITE;
+                cmd.Parameters.AddWithValue("@name", myEvent.name);
+                cmd.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
+                cmd.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
+                cmd.Parameters.AddWithValue("@location", myEvent.location);
+                cmd.Parameters.AddWithValue("@description", myEvent.description);
+                cmd.Parameters.AddWithValue("@user", myUser.UID);
+                cmd.Parameters.AddWithValue("@id", myEvent.Key);
+
+                int affected = cmd.ExecuteNonQuery();
+                Console.Write("");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("There Was An Error Updating Event " + e.Message,"Update Error");
+            }
+            finally
+            {
+                localDBConnection.Close();
+            }
+        }
 
         public void FlushCache()
         {

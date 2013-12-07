@@ -73,12 +73,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventComboBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="EventComboBox.Designer.cs">
-      <DependentUpon>EventComboBox.cs</DependentUpon>
-    </Compile>
     <Compile Include="LoginForms\AddUser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -120,9 +114,6 @@
       <DependentUpon>SettingsFormsGeneral.cs</DependentUpon>
     </Compile>
     <Compile Include="User.cs" />
-    <EmbeddedResource Include="EventComboBox.resx">
-      <DependentUpon>EventComboBox.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="LoginForms\AddUser.resx">
       <DependentUpon>AddUser.cs</DependentUpon>
     </EmbeddedResource>
