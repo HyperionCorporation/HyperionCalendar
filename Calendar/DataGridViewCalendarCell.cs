@@ -88,6 +88,38 @@ namespace Calendar
             
         }
 
+        protected override void OnMouseDown(DataGridViewCellMouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            
+            if (e.Button == MouseButtons.Right)
+            {
+
+                this.ContextMenuStrip = new ContextMenuStrip();
+
+                ToolStripItem viewEvent2 = new ToolStripMenuItem();
+                viewEvent2.Text = "Event";
+                viewEvent2.Name = "view_events2";
+                this.ContextMenuStrip.Items.Add(viewEvent2);
+
+            
+                
+                this.ContextMenuStrip.Items.Add(new ToolStripSeparator());
+
+                this.ContextMenuStrip.Items.Add("Another Setting");
+
+                ContextMenuStrip.Show();
+            }
+        }
+
+        void item_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Events:");
+            foreach (KeyValuePair<int, Event> myEvent in events)
+            {
+                Console.WriteLine(myEvent.Value.name + "\n" + myEvent.Value.location);
+            }
+        }
 
         protected override void OnDoubleClick(DataGridViewCellEventArgs e)
         {

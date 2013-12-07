@@ -18,7 +18,7 @@ namespace Calendar
         private Persistence persistence;
         private User user;
         Dictionary<int, Event> events;
-        
+
 
         public MainForm()
         {
@@ -31,7 +31,7 @@ namespace Calendar
             //Get user login
             Form signIn = new SignIn(persistence);
             DialogResult signInResult = signIn.ShowDialog();
-            if(signInResult == DialogResult.OK)
+            if (signInResult == DialogResult.OK)
             {
                 currentDate = DateTime.Now;
                 currentDateFirstOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
@@ -50,7 +50,7 @@ namespace Calendar
                 Application.Exit();
             }
 
-           
+
 
         }
 
@@ -109,14 +109,14 @@ namespace Calendar
                            currentDate.Year == DateTime.Now.Year)
             {
                 //Put the actual date through, that way correct date is highlighted
-                currentCalendar = new Calendar(currentDate, this,persistence,user);
+                currentCalendar = new Calendar(currentDate, this, persistence, user);
             }
 
             else
             {
-                currentCalendar = new Calendar(currentDateFirstOfMonth, this,persistence,user);
-            } 
-            
+                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user);
+            }
+
             dataGridView1.Rows.Clear();
             currentCalendar.buildDataSet(dataGridView1);
             lblMonthYear.Text = getDateString(currentDateFirstOfMonth);
@@ -140,12 +140,12 @@ namespace Calendar
                 currentDate.Year == DateTime.Now.Year)
             {
                 //Put the actual date through, that way correct date is highlighted
-                currentCalendar = new Calendar(currentDate, this,persistence,user);
+                currentCalendar = new Calendar(currentDate, this, persistence, user);
             }
 
             else
             {
-                currentCalendar = new Calendar(currentDateFirstOfMonth, this,persistence,user);
+                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user);
             }
 
             dataGridView1.Rows.Clear();
@@ -155,7 +155,7 @@ namespace Calendar
 
             if (currentDate.Month == DateTime.Now.Month)
                 currentCalendar.selectCurrentDate(dataGridView1);
-            
+
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -163,7 +163,7 @@ namespace Calendar
             dataGridView1.ClearSelection();
             if (currentCalendar == null)
                 Application.Exit();
-            else   
+            else
                 currentCalendar.selectCurrentDate(dataGridView1);
         }
 
@@ -177,24 +177,5 @@ namespace Calendar
             Form settings = new SettingsFormsGeneral(sa, user.Name);
             DialogResult result = settings.ShowDialog();
         }
-
-        private void dataGridView1_CurrentCellChanged(object sender, EventArgs e)
-        {
-            cmboEvents.Items.Clear();
-            Dictionary<int, Event> events;
-            String day;
-            day = dataGridView1.CurrentCell.Value.ToString();
-            DateTime date;
-           // day = currentDate.Year + "/" + currentDate.Month + "/" + day + " 6:00:00z";
-            String time = "{0}/{1}/{2} 6:00:00z";
-            time = String.Format(time, currentDate.Year, currentDate.Month, day);
-            date = DateTime.Parse(time);
-            events = persistence.GetEvents(user, date);
-            foreach(KeyValuePair<int,Event> myEvent in events)
-            {
-                cmboEvents.Items.Add(myEvent.Value.name);
-            }
-        }
-
     }
 }

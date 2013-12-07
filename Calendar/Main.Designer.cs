@@ -30,7 +30,6 @@
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.cmboEvents = new System.Windows.Forms.ComboBox();
             this.btnPrevMonth = new System.Windows.Forms.Button();
             this.btnNextMonth = new System.Windows.Forms.Button();
             this.lblMonthYear = new System.Windows.Forms.Label();
@@ -59,11 +58,9 @@
             this.dataGridView1.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dataGridView1.Size = new System.Drawing.Size(994, 780);
             this.dataGridView1.TabIndex = 0;
-            this.dataGridView1.CurrentCellChanged += new System.EventHandler(this.dataGridView1_CurrentCellChanged);
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.cmboEvents);
             this.panel1.Controls.Add(this.btnPrevMonth);
             this.panel1.Controls.Add(this.btnNextMonth);
             this.panel1.Controls.Add(this.lblMonthYear);
@@ -72,15 +69,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(905, 40);
             this.panel1.TabIndex = 1;
-            // 
-            // cmboEvents
-            // 
-            this.cmboEvents.FormattingEnabled = true;
-            this.cmboEvents.Location = new System.Drawing.Point(3, 3);
-            this.cmboEvents.Name = "cmboEvents";
-            this.cmboEvents.Size = new System.Drawing.Size(206, 33);
-            this.cmboEvents.TabIndex = 3;
-            this.cmboEvents.Text = "Events";
             // 
             // btnPrevMonth
             // 
@@ -208,7 +196,6 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem syncToolStripMenuItem;
-        private System.Windows.Forms.ComboBox cmboEvents;
     }
 }
 
