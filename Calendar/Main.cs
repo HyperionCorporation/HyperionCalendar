@@ -53,7 +53,6 @@ namespace Calendar
 
         }
 
-
         private String getDateString(DateTime date)
         {
             string month = string.Empty;

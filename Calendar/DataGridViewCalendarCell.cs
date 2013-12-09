@@ -12,7 +12,7 @@ namespace Calendar
 {
     public partial class DataGridViewCalendarCell : DataGridViewTextBoxCell
     {
-        Dictionary<int, Event> events;
+        Dictionary<int, Event> events = null;
         int rectCount = 0;
         int rectIndex = 0;
         Point cursorPosition;
@@ -20,10 +20,12 @@ namespace Calendar
         public DateTime date;
         private Persistence persistence;
         private User user;
+        private DataGridView parent;
 
         public DataGridViewCalendarCell(DateTime date, Object Value, Persistence persistence, User user)
         {
             InitializeComponent();
+            this.parent = this.DataGridView;
             brush = new SolidBrush(Color.FromArgb(128,Color.Blue));
             events = new Dictionary<int,Event>();
             this.Value = Value;
@@ -35,6 +37,7 @@ namespace Calendar
 
         private void LoadEvents()
         {
+            events.Clear();
             events = persistence.GetEvents(user, date);
         }
 
@@ -76,8 +79,7 @@ namespace Calendar
         private void generateRightClickMenu()
         {
             this.ContextMenuStrip = new ContextMenuStrip();
-            Dictionary<int, Event> events;
-            events = persistence.GetEvents(user, date);
+            LoadEvents();
             List<ToolStripItem> tsItems = new List<ToolStripItem>();
             foreach (KeyValuePair<int, Event> myEvent in events)
             {
@@ -204,7 +206,18 @@ namespace Calendar
                 events.Remove(modifyEvent.Key);
                 events.Add(modifyEvent.Key,modifyEvent);
                 modifyEvent.drawn = false;
-                this.DataGridView.InvalidateCell(this);
+                LoadEvents();
+                foreach (DataGridViewRow row in this.DataGridView.Rows)
+                {
+                    foreach (DataGridViewCalendarCell cell in row.Cells)
+                    {
+                        DataGridView.InvalidateCell(cell);
+                        cell.LoadEvents();
+                    }
+                }
+
+
+
             }
         }
     }
