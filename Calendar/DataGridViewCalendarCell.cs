@@ -12,7 +12,6 @@ namespace Calendar
 {
     public partial class DataGridViewCalendarCell : DataGridViewTextBoxCell
     {
-        //Rectangle[] rectangles; //Gonna have a list of events instead of rectangles
         Dictionary<int, Event> events;
         int rectCount = 0;
         int rectIndex = 0;
@@ -25,7 +24,6 @@ namespace Calendar
         public DataGridViewCalendarCell(DateTime date, Object Value, Persistence persistence, User user)
         {
             InitializeComponent();
-            //rectangles = new Rectangle[5];
             brush = new SolidBrush(Color.FromArgb(128,Color.Blue));
             events = new Dictionary<int,Event>();
             this.Value = Value;
@@ -56,12 +54,7 @@ namespace Calendar
                         if (!calendarEvent.Value.drawn)
                         {
                             calendarEvent.Value.rect.X = cellBounds.X + 1;
-                            
-                            
-                            //if (cursorPosition.X == 0 && cursorPosition.Y == 0)
                             calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
-                            //else
-                            //    calendarEvent.Value.rect.Y = cursorPosition.Y + 1;
                             calendarEvent.Value.rect.Width = cellBounds.Width - 4;
                             calendarEvent.Value.rect.Height = cellBounds.Height - 90;
                             calendarEvent.Value.drawn = true;
@@ -77,17 +70,9 @@ namespace Calendar
             
         }
 
-        protected override void OnMouseEnter(int rowIndex)
-        {
-            //this.DataGridView.InvalidateCell(this);
-        }
-
-        protected override void OnMouseLeave(int rowIndex)
-        {
-            //this.DataGridView.InvalidateCell(this);
-            
-        }
-
+        /// <summary>
+        /// Generates the right click menu.
+        /// </summary>
         private void generateRightClickMenu()
         {
             this.ContextMenuStrip = new ContextMenuStrip();
@@ -112,6 +97,10 @@ namespace Calendar
             ContextMenuStrip.Show();
         }
 
+        /// <summary>
+        /// Called when the user holds down a mouse button while the pointer is on a cell. Shows the menu
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.DataGridViewCellMouseEventArgs" /> that contains the event data.</param>
         protected override void OnMouseDown(DataGridViewCellMouseEventArgs e)
         {
             base.OnMouseDown(e);
@@ -133,9 +122,13 @@ namespace Calendar
             ToolStripItem tsItem = sender as ToolStripItem;
             Event myEvent = tsItem.Tag as Event;
             updateEvent(myEvent);
-            generateRightClickMenu();
+           // generateRightClickMenu(); //Not needed, keep just in case. 
         }
 
+        /// <summary>
+        /// Called when the cell is double-clicked. Used to show the event that is clicked. 
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.DataGridViewCellEventArgs" /> that contains the event data.</param>
         protected override void OnDoubleClick(DataGridViewCellEventArgs e)
         {
             base.OnDoubleClick(e);
@@ -152,16 +145,9 @@ namespace Calendar
                 DialogResult addEventResult = addEvent.ShowDialog();
                 if (addEventResult == DialogResult.OK)
                 {
-                    //This entire thing is just a clusterfuck. Clean it
                     if(addEvent.Tag != null)
                     {
                         Event myGoingToRemoveEvent = (Event)addEvent.Tag;
-                       /* MessageBox.Show(myGoingToRemoveEvent.name + "\n" +
-                        *    myGoingToRemoveEvent.begin + "\n" +
-                        *    myGoingToRemoveEvent.end + "\n" +
-                        *    myGoingToRemoveEvent.location + "\n" +
-                        *    myGoingToRemoveEvent.description, "Event Information");
-                        */
                         myGoingToRemoveEvent.rect = rect;
                         events.Add(myGoingToRemoveEvent.Key, myGoingToRemoveEvent);
                         this.DataGridView.InvalidateCell(this);
@@ -176,6 +162,11 @@ namespace Calendar
             
         }
 
+        /// <summary>
+        /// Returns the event that was clicked. 
+        /// </summary>
+        /// <param name="cursorPosition">The cursor position.</param>
+        /// <returns></returns>
         private Event checkEvent(Point cursorPosition)
         {
             foreach (KeyValuePair<int,Event> calendarEvent in events)
@@ -189,20 +180,10 @@ namespace Calendar
             return null;
         }
 
-        private void addRectangle(Rectangle rect)
-        {
-            rect.Y = cursorPosition.Y;
-            //rectangles[rectIndex] = rect;
-            
-            if (rectIndex < 4)
-                rectIndex++;
-            else
-                rectIndex = 0;
-
-            if (rectCount < 4)
-                rectCount++;
-
-        }
+        /// <summary>
+        /// Updates the event
+        /// </summary>
+        /// <param name="exisitingEvent">The exisiting event.</param>
         private void updateEvent(Event exisitingEvent)
         {
             Form editEvent = new EventModifier(exisitingEvent, true);
