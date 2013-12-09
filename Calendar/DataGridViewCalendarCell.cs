@@ -59,7 +59,7 @@ namespace Calendar
                             
                             
                             //if (cursorPosition.X == 0 && cursorPosition.Y == 0)
-                                calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
+                            calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
                             //else
                             //    calendarEvent.Value.rect.Y = cursorPosition.Y + 1;
                             calendarEvent.Value.rect.Width = cellBounds.Width - 4;
@@ -135,6 +135,8 @@ namespace Calendar
             {
                 Event modifyEvent = (Event)editEvent.Tag;
                 persistence.EditEvent(modifyEvent, user);
+                modifyEvent.drawn = false;
+                this.DataGridView.InvalidateCell(this);
             }
         }
 
@@ -188,6 +190,8 @@ namespace Calendar
                 {
                     Event modifyEvent = (Event)editEvent.Tag;
                     persistence.EditEvent(modifyEvent, user);
+                    modifyEvent.drawn = false;
+                    this.DataGridView.InvalidateCell(this);
                 }
             }
             
