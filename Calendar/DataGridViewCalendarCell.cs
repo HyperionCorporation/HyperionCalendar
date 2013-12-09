@@ -88,40 +88,52 @@ namespace Calendar
             
         }
 
+        private void generateRightClickMenu()
+        {
+            this.ContextMenuStrip = new ContextMenuStrip();
+            Dictionary<int, Event> events;
+            events = persistence.GetEvents(user, date);
+            List<ToolStripItem> tsItems = new List<ToolStripItem>();
+            foreach (KeyValuePair<int, Event> myEvent in events)
+            {
+                ToolStripItem myTSItem = new ToolStripMenuItem();
+                myTSItem.Text = myEvent.Value.name;
+                myTSItem.Tag = myEvent.Value;
+                myTSItem.Click += new System.EventHandler(EventListClick);
+                tsItems.Add(myTSItem);
+                this.ContextMenuStrip.Items.Add(myTSItem);
+            }
+
+
+            this.ContextMenuStrip.Items.Add(new ToolStripSeparator());
+
+            this.ContextMenuStrip.Items.Add("Another Setting");
+
+            ContextMenuStrip.Show();
+        }
+
         protected override void OnMouseDown(DataGridViewCellMouseEventArgs e)
         {
             base.OnMouseDown(e);
             
             if (e.Button == MouseButtons.Right)
             {
-                this.ContextMenuStrip = new ContextMenuStrip();
-                Dictionary<int, Event> events;
-                events = persistence.GetEvents(user, date);
-                List<ToolStripItem> tsItems = new List<ToolStripItem>();
-                foreach(KeyValuePair<int, Event> myEvent in events)
-                {
-                    ToolStripItem myTSItem = new ToolStripMenuItem();
-                    myTSItem.Text = myEvent.Value.name;
-                    myTSItem.Tag = myEvent.Value;
-                    myTSItem.Click += new System.EventHandler(item_Click);
-                    tsItems.Add(myTSItem);
-                    this.ContextMenuStrip.Items.Add(myTSItem);
-                }
-                
-
-                this.ContextMenuStrip.Items.Add(new ToolStripSeparator());
-
-                this.ContextMenuStrip.Items.Add("Another Setting");
-
-                ContextMenuStrip.Show();
+                generateRightClickMenu();
             }
         }
 
-        void item_Click(object sender, EventArgs e)
+
+        /// <summary>
+        /// Event listener for the right button menu
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void EventListClick(object sender, EventArgs e)
         {
             ToolStripItem tsItem = sender as ToolStripItem;
             Event myEvent = tsItem.Tag as Event;
             updateEvent(myEvent);
+            generateRightClickMenu();
         }
 
         protected override void OnDoubleClick(DataGridViewCellEventArgs e)
@@ -208,6 +220,8 @@ namespace Calendar
             {
                 Event modifyEvent = (Event)editEvent.Tag;
                 persistence.EditEvent(modifyEvent, user);
+                events.Remove(modifyEvent.Key);
+                events.Add(modifyEvent.Key,modifyEvent);
                 modifyEvent.drawn = false;
                 this.DataGridView.InvalidateCell(this);
             }
