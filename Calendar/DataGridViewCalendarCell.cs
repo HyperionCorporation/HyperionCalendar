@@ -131,6 +131,11 @@ namespace Calendar
                 persistence.DeleteEvent(deleteEvent);
                 this.DataGridView.InvalidateCell(this);
             }
+            else if (editEventResult == DialogResult.OK)
+            {
+                Event modifyEvent = (Event)editEvent.Tag;
+                persistence.EditEvent(modifyEvent, user);
+            }
         }
 
         protected override void OnDoubleClick(DataGridViewCellEventArgs e)
