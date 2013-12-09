@@ -34,26 +34,36 @@ namespace Calendar
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            
 
-            StorageLocation loc = persistence.UserExists(txtUserLogin.Text.ToLower());
-
-            if (loc != StorageLocation.NULL)
+            if (txtUserLogin.Text == "")
             {
-                if (validateLogin(loc))
-                {
-                    this.DialogResult = DialogResult.OK;
-                    this.Tag = user;
-                }
-                else
-                {
-                    MessageBox.Show("Wrong Password", "Login Error");
-                }
+                MessageBox.Show("Please enter a Username", "Login Error");
             }
-
+            else if (txtPassword.Text == "")
+            {
+                MessageBox.Show("Please enter a Password", "Login Error");
+            }
             else
             {
-                MessageBox.Show("User doesn't exist", "Login Error");
+                StorageLocation loc = persistence.UserExists(txtUserLogin.Text.ToLower());
+
+                if (loc != StorageLocation.NULL)
+                {
+                    if (validateLogin(loc))
+                    {
+                        this.DialogResult = DialogResult.OK;
+                        this.Tag = user;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Wrong Password", "Login Error");
+                    }
+                }
+
+                else
+                {
+                    MessageBox.Show("User doesn't exist", "Login Error");
+                }
             }
         }
 

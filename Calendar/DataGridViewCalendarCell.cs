@@ -121,23 +121,7 @@ namespace Calendar
         {
             ToolStripItem tsItem = sender as ToolStripItem;
             Event myEvent = tsItem.Tag as Event;
-            Form editEvent = new EventModifier(myEvent, true);
-            DialogResult editEventResult = editEvent.ShowDialog();
-            if (editEventResult == DialogResult.No)
-            {
-                //Delete the event
-                Event deleteEvent = (Event)editEvent.Tag;
-                events.Remove(deleteEvent.Key);
-                persistence.DeleteEvent(deleteEvent);
-                this.DataGridView.InvalidateCell(this);
-            }
-            else if (editEventResult == DialogResult.OK)
-            {
-                Event modifyEvent = (Event)editEvent.Tag;
-                persistence.EditEvent(modifyEvent, user);
-                modifyEvent.drawn = false;
-                this.DataGridView.InvalidateCell(this);
-            }
+            updateEvent(myEvent);
         }
 
         protected override void OnDoubleClick(DataGridViewCellEventArgs e)
@@ -175,24 +159,7 @@ namespace Calendar
             }
             else
             {
-                Form editEvent = new EventModifier(exisitingEvent, true);
-                DialogResult editEventResult = editEvent.ShowDialog();
-                if (editEventResult == DialogResult.No)//
-                {
-                    //Delete the event
-                    Event deleteEvent = (Event)editEvent.Tag;
-                    events.Remove(deleteEvent.Key);
-                    persistence.DeleteEvent(deleteEvent);
-                    this.DataGridView.InvalidateCell(this);
-                }
-
-                else if (editEventResult == DialogResult.OK)
-                {
-                    Event modifyEvent = (Event)editEvent.Tag;
-                    persistence.EditEvent(modifyEvent, user);
-                    modifyEvent.drawn = false;
-                    this.DataGridView.InvalidateCell(this);
-                }
+                updateEvent(exisitingEvent);
             }
             
         }
@@ -223,6 +190,27 @@ namespace Calendar
             if (rectCount < 4)
                 rectCount++;
 
+        }
+        private void updateEvent(Event exisitingEvent)
+        {
+            Form editEvent = new EventModifier(exisitingEvent, true);
+            DialogResult editEventResult = editEvent.ShowDialog();
+            if (editEventResult == DialogResult.No)//
+            {
+                //Delete the event
+                Event deleteEvent = (Event)editEvent.Tag;
+                events.Remove(deleteEvent.Key);
+                persistence.DeleteEvent(deleteEvent);
+                this.DataGridView.InvalidateCell(this);
+            }
+
+            else if (editEventResult == DialogResult.OK)
+            {
+                Event modifyEvent = (Event)editEvent.Tag;
+                persistence.EditEvent(modifyEvent, user);
+                modifyEvent.drawn = false;
+                this.DataGridView.InvalidateCell(this);
+            }
         }
     }
 }
