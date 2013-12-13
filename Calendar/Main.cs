@@ -53,13 +53,26 @@ namespace Calendar
             }
 
             AutoResetEvent autoEvent = new AutoResetEvent(false);
-            sync = new Sync(persistence, user);
+            sync = new Sync(persistence, user,this);
             timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 1000, 120000);
             syncThread = new Thread(new ThreadStart(sync.startSync));
             syncThread.Name = "SyncThread";
+
             syncThread.IsBackground = true;
             syncThread.Start();
 
+        }
+
+        public void refreshAllCell()
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                foreach (DataGridViewCalendarCell cell in row.Cells)
+                {
+                    cell.LoadEvents();
+                    cell.Invalidate();
+                }
+            }
         }
 
         private String getDateString(DateTime date)
@@ -193,13 +206,15 @@ namespace Calendar
         private Boolean running;
         private Persistence persistence;
         private User user;
+        private MainForm main;
 
-        public Sync(Persistence persistence,User user)
+        public Sync(Persistence persistence,User user,MainForm main)
         {
             doSync = false;
             running = true;
             this.persistence = persistence;
             this.user = user;
+            this.main = main;
         }
 
         public void startSync()
@@ -211,10 +226,7 @@ namespace Calendar
                     int? id = user.UID;
                     int a = Convert.ToInt32(user.UID);
                     //Sync
-                    if (!persistence.DoSync(Convert.ToInt32(user.UID)))
-                    {
-                        System.Diagnostics.Debug.WriteLine("Error Syncing");
-                    }
+                    persistence.DoSync(Convert.ToInt32(user.UID),main);                    
                     doSync = false;
                 }
             }

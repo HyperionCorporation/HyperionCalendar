@@ -33,7 +33,7 @@ namespace Calendar
 
         public static readonly string GET_USER_MYSQL = "SELECT * FROM users where email = @email limit 1";
 
-        public static readonly string SAVE_EVENT_MYSQL = "INSERT INTO events (name,begintime,endtime,location,description,user,timelastedit,uid) VALUES (@name,@begintime,@endtime,@location,@description,@userid,@timelastedit,@uid)";
+        public static readonly string SAVE_EVENT_MYSQL = "INSERT INTO events (name,begintime,endtime,location,description,user,timelastedit,uid,deleteEvent) VALUES (@name,@begintime,@endtime,@location,@description,@userid,@timelastedit,@uid,@delete)";
 
         public static readonly string SAVE_EVENT_SQLITE = "INSERT INTO events (name,begintime,endtime,location,description,user,timelastedit,uid,deleteEvent) VALUES(@name,@begintime,@endtime,@location,@description,@userid,@timelastedit,@uid,@delete)";
 
@@ -53,7 +53,7 @@ namespace Calendar
 
         public static readonly string UPDATE_EVENT_SQLITE = "UPDATE events SET name=@name,begintime=@begintime,endtime=@endtime,location=@location,description=@description,user=@user,timelastedit=@timelastedit,deleteEvent=@delete where uid=@id";
 
-        public static readonly string SYNC_REMOTE_WITH_LOCAL = "Update events set name=@name,begintime=@begintime,endtime=@endtime,location=@location,description=@description,timelastedit=@timelastedit where uid=@uid";
+        public static readonly string SYNC_REMOTE_WITH_LOCAL = "Update events set name=@name,begintime=@begintime,endtime=@endtime,location=@location,description=@description,timelastedit=@timelastedit,deleteEvent=@delete where uid=@uid";
         
         public static readonly string GET_LAST_MODIFIED_TIME_MYSQL = "Select timelastedit from events where uid=@uid";
     

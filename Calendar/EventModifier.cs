@@ -122,7 +122,7 @@ namespace Calendar
         private void btnBack_Click(object sender, EventArgs e)
         {
             this.Tag = null;
-            this.DialogResult = DialogResult.OK;
+            this.DialogResult = DialogResult.Cancel;
         }
 
     }

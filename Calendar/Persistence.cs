@@ -27,7 +27,7 @@ namespace Calendar
         {
             //Create an SQLite Persistence Object
             sqlitePersitance = new SQLitePersistance();
-            mysqlPersitance = new MySQLPersistence();
+            mysqlPersitance = new MySQLPersistence(sqlitePersitance);
         }
 
         /// <summary>
@@ -163,10 +163,10 @@ namespace Calendar
             return mysqlPersitance.CheckConnection();
         }
 
-        public bool DoSync(int uid)
+        public void DoSync(int uid,MainForm main)
         {
             List<Event> eventList = sqlitePersitance.getEvents(uid);
-            return mysqlPersitance.DoSync(eventList, uid);
+            mysqlPersitance.DoSync(eventList, uid,main);
         }
 
     }
@@ -302,8 +302,7 @@ namespace Calendar
                     long timeLastModified = (long)reader["timelastedit"];
                     long key = (long)reader["uid"];
                     bool deleteEvent = Convert.ToBoolean(reader["deleteEvent"]);
-                    if(!deleteEvent)
-                        eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description, key, new DateTime(timeLastModified), deleteEvent));
+                    eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description, key, new DateTime(timeLastModified), deleteEvent));
                 }
 
             }
@@ -466,9 +465,11 @@ namespace Calendar
         private string database;
         private string uid;
         private string password;
+        private SQLitePersistance sqLitePersist;
 
-        public MySQLPersistence()
+        public MySQLPersistence(SQLitePersistance sqLitePersist)
         {
+            this.sqLitePersist = sqLitePersist;
             Initialize();
         }
 
@@ -492,11 +493,11 @@ namespace Calendar
         /// Opens the connection.
         /// </summary>
         /// <returns></returns>
-        private bool OpenConnection()
+        private bool OpenConnection(MySqlConnection connection)
         {
-            if (connection.State != System.Data.ConnectionState.Closed ||
-                connection.State != System.Data.ConnectionState.Broken ||
-                connection.State != System.Data.ConnectionState.Executing ||
+            if (connection.State != System.Data.ConnectionState.Open &&
+                connection.State != System.Data.ConnectionState.Broken &&
+                connection.State != System.Data.ConnectionState.Executing &&
                 connection.State != System.Data.ConnectionState.Fetching)
             {
                 try
@@ -517,7 +518,7 @@ namespace Calendar
                 }
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -553,9 +554,10 @@ namespace Calendar
             string location = myEvent.location;
             string description = myEvent.description;
             long key = myEvent.Key; //Get the key and save it to db.
+            bool delete = myEvent.DeleteEvent;
             string query = PermanentSettings.SAVE_EVENT_MYSQL;
 
-            if (this.OpenConnection())
+            if (this.OpenConnection(connection))
             {
                 //create command and assign the query and connection from the constructor
                 MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -567,6 +569,7 @@ namespace Calendar
                 cmd.Parameters.AddWithValue("@userid", user.UID);
                 cmd.Parameters.AddWithValue("@timelastedit", DateTime.Now.Ticks);
                 cmd.Parameters.AddWithValue("@uid", key);
+                cmd.Parameters.AddWithValue("@delete", delete);
                 //Execute command
                 cmd.ExecuteNonQuery();
 
@@ -578,8 +581,6 @@ namespace Calendar
 
             return false;
         }
-
-
 
         /// <summary>
         /// Saves the user in a MySQL Database
@@ -595,7 +596,7 @@ namespace Calendar
             string getuidquery = PermanentSettings.GET_UID_MYSQL;
 
             //open connection
-            if (this.OpenConnection() == true)
+            if (this.OpenConnection(connection) == true)
             {
                 //create command and assign the query and connection from the constructor
                 MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -642,9 +643,8 @@ namespace Calendar
 
         public bool CheckConnection()
         {
-            return OpenConnection();
+            return OpenConnection(connection);
         }
-
 
         /// <summary>
         /// Gets the user from the Remote DB
@@ -656,7 +656,7 @@ namespace Calendar
             string query = PermanentSettings.GET_USER_MYSQL;
 
             //Open connection
-            if (this.OpenConnection() == true)
+            if (this.OpenConnection(connection) == true)
             {
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -711,18 +711,17 @@ namespace Calendar
             get{return server;}
         }
 
-
         /// <summary>
         /// Does the synchronize between MySQL and SQLite
         /// </summary>
         /// <param name="eventList">The event list.</param>
-        public bool DoSync(List<Event> eventList, int uid)
+        public void DoSync(List<Event> eventList, int uid, MainForm main)
         {
             Console.WriteLine("Syncing The Database");
             string querySync = PermanentSettings.SYNC_REMOTE_WITH_LOCAL;
             string queryInsert = PermanentSettings.SAVE_EVENT_MYSQL;
             string queryGetRemoteLastModifiedTime = PermanentSettings.GET_LAST_MODIFIED_TIME_MYSQL;
-            string getEventQuery = PermanentSettings.GET_EVENT_MYSQL;
+            //string getEventQuery = PermanentSettings.GET_EVENT_MYSQL;
             List<Tuple<bool, DateTime>> lastModifiedTimes = new List<Tuple<bool, DateTime>>(); //Store if it exists in rdb or not as well as the last updated Time.
 
 
@@ -731,7 +730,7 @@ namespace Calendar
                 //create command and assign the query and connection from the constructor
                 MySqlCommand cmd = new MySqlCommand(queryGetRemoteLastModifiedTime, connection);
                 cmd.Parameters.AddWithValue("@uid", myEvent.Key);
-                if (this.OpenConnection() == true)
+                if (this.OpenConnection(connection) == true)
                 {
                     //Execute command
                     try
@@ -754,7 +753,6 @@ namespace Calendar
                     catch (Exception e)
                     {
                         System.Diagnostics.Debug.WriteLine("Error Persistence.GetLastEditedTime " + e.Message);
-                        return false;
                     }
 
                     finally
@@ -774,13 +772,12 @@ namespace Calendar
             int index = 0;
             foreach (Event myEvent in eventList)
             {
-                //Update the remote if it is behind the local.
-                if (this.OpenConnection() == true)
+                if (this.OpenConnection(connection) == true)
                 {
                     if (lastModifiedTimes[index].Item1 && myEvent.LastModified > lastModifiedTimes[index].Item2)
                     {
-                        //Event Exists in DB and is older than the local DB
-                        index++;
+                        //Event Exists in DB and is older than the local DB. Update the remote
+
                         MySqlCommand cmd = new MySqlCommand(querySync, connection);
                         cmd.Parameters.AddWithValue("@name", myEvent.name);
                         cmd.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
@@ -789,23 +786,30 @@ namespace Calendar
                         cmd.Parameters.AddWithValue("@description", myEvent.description);
                         cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
                         cmd.Parameters.AddWithValue("@uid", myEvent.Key);
-
+                        cmd.Parameters.AddWithValue("@delete", myEvent.DeleteEvent);
+                        
                         //Execute command
                         try
                         {
-                            cmd.ExecuteNonQuery();
+                            int affected = cmd.ExecuteNonQuery();
+                            Console.WriteLine("");
                         }
 
                         catch (Exception e)
                         {
                             System.Diagnostics.Debug.WriteLine("Error Persistence.DoSync " + e.Message);
-                            return false;
                         }
 
                         finally
                         {
                             this.CloseConnection();
                         }
+                    }
+                    else if (myEvent.DeleteEvent)
+                    {
+                        //Event is marked for deletion.
+                        sqLitePersist.DeleteEvent(myEvent);
+                        
                     }
                     else if (!lastModifiedTimes[index].Item1)
                     {
@@ -819,7 +823,8 @@ namespace Calendar
                         cmd.Parameters.AddWithValue("@userid", uid);
                         cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
                         cmd.Parameters.AddWithValue("@uid", myEvent.Key);
-                        index++;
+                        cmd.Parameters.AddWithValue("@delete", myEvent.DeleteEvent);
+
                         //Execute command
                         try
                         {
@@ -829,7 +834,6 @@ namespace Calendar
                         catch (Exception e)
                         {
                             System.Diagnostics.Debug.WriteLine("Error Persistence.DoSync " + e.Message);
-                            return false;
                         }
                         //close connection
                         finally
@@ -838,28 +842,23 @@ namespace Calendar
                         }
 
                     }
+
+                    index++;
                 }
 
-                else
-                {
-                    return false;
-                }
+  
             }
 
-            GetEventsInRemote(eventList,uid);
+            GetEventsInRemote(eventList,uid,main); //Get events that exist in remote but not in local.
             Console.WriteLine("Done Syncing The Database");
-
-            return true;
         }
 
-        private void GetEventsInRemote(List<Event> eventList,int uid)
+        private void GetEventsInRemote(List<Event> eventList,int uid, MainForm main)
         {
                
             List<Event> returnedEvents = new List<Event>();
-            //GET_ALL_EVENTS_MYSQL
             //Get all the events in the Remote DB
-            //Open connection
-            if (this.OpenConnection() == true)
+            if (this.OpenConnection(connection) == true)
             {
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_ALL_EVENTS_MYSQL, connection);
@@ -869,7 +868,7 @@ namespace Calendar
                 {
                     dataReader = cmd.ExecuteReader();
                     //Read the data and store them in the list
-                    if (dataReader.Read())
+                    while(dataReader.Read())
                     {
                         string name = Convert.ToString(dataReader["name"]);
                         long beginTime = Convert.ToInt64(dataReader["begintime"]);
@@ -879,8 +878,8 @@ namespace Calendar
                         int userID = Convert.ToInt32(dataReader["user"]);
                         long timelastedit = Convert.ToInt64(dataReader["timelastedit"]);
                         long uniqueID = Convert.ToInt64(dataReader["uid"]);
-
-                        returnedEvents.Add(new Event(name, new DateTime(beginTime), new DateTime(endtime), location, description, uniqueID, new DateTime(timelastedit), false));
+                        bool delete = Convert.ToBoolean(dataReader["deleteEvent"]);
+                        returnedEvents.Add(new Event(name, new DateTime(beginTime), new DateTime(endtime), location, description, uniqueID, new DateTime(timelastedit), delete));
                     }
 
             
@@ -905,9 +904,14 @@ namespace Calendar
             {
                 foreach(Event myEvent  in eventList)
                 {
+                    if (returnedEvents.Count == 0)
+                        break;
                     if (returnedEvents[i].Key == myEvent.Key)
                         returnedEvents.RemoveAt(i);
                 }
+
+                if (returnedEvents.Count == 0)
+                    break;
             }
 
             SQLiteConnection localDBConnection = new SQLiteConnection("Data Source=" + SQLitePersistance.localDatabase + ";Version=3;");
@@ -942,6 +946,8 @@ namespace Calendar
                 {
                     localDBConnection.Close();
                 }
+
+                main.refreshAllCell();
             }
         }
     }

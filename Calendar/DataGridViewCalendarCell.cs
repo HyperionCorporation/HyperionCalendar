@@ -35,7 +35,10 @@ namespace Calendar
             LoadEvents();
         }
 
-        private void LoadEvents()
+        /// <summary>
+        /// Loads the events from the local DB
+        /// </summary>
+        public void LoadEvents()
         {
             events.Clear();
             events = persistence.GetEvents(user, date);
@@ -54,7 +57,7 @@ namespace Calendar
            
                     foreach(KeyValuePair<long,Event> calendarEvent in events)
                     {
-                        if (!calendarEvent.Value.drawn)
+                        if (!calendarEvent.Value.DeleteEvent && !calendarEvent.Value.drawn)
                         {
                             calendarEvent.Value.rect.X = cellBounds.X + 1;
                             calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
@@ -227,10 +230,13 @@ namespace Calendar
                         cell.LoadEvents();
                     }
                 }
-
-
-
             }
         }
+
+        public void Invalidate()
+        {
+            DataGridView.InvalidateCell(this);
+        }
+
     }
 }
