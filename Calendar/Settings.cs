@@ -43,7 +43,9 @@ namespace Calendar
         
         public static readonly string GET_EVENTS_SQLITE = "SELECT * FROM events where user = @uid";
 
-        public static readonly string DELETE_EVENT_SQLITE = "DELETE FROM events where id = @key";
+        public static readonly string DELETE_EVENT_SQLITE = "DELETE FROM events where uid = @key";
+
+        public static readonly string DELETE_EVENT_MYSQL = "DELETE FROM events where uid = @key";
 
         public static readonly string CACHE_USER_SQLITE = "INSERT or REPLACE into user (id,name,email,password,salt,timelastedit) VALUES (@id,@name,@email,@password,@salt,@currentTime)";
 

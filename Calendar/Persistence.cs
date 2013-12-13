@@ -260,7 +260,8 @@ namespace Calendar
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = PermanentSettings.DELETE_EVENT_SQLITE;
                 cmd.Parameters.Add(new SQLiteParameter("@key", deleteEvent.Key));
-                cmd.ExecuteNonQuery();
+                int affected = cmd.ExecuteNonQuery();
+                Console.Write("A");
             }
             catch (Exception e)
             {
@@ -715,6 +716,8 @@ namespace Calendar
         /// Does the synchronize between MySQL and SQLite
         /// </summary>
         /// <param name="eventList">The event list.</param>
+        /// <param name="uid">The uid of the current User</param>
+        /// <param name="main">The mainProgram class</param>
         public void DoSync(List<Event> eventList, int uid, MainForm main)
         {
             Console.WriteLine("Syncing The Database");
@@ -809,7 +812,7 @@ namespace Calendar
                     {
                         //Event is marked for deletion.
                         sqLitePersist.DeleteEvent(myEvent);
-                        
+                        DeleteEvent(myEvent,connection);
                     }
                     else if (!lastModifiedTimes[index].Item1)
                     {
@@ -853,6 +856,42 @@ namespace Calendar
             Console.WriteLine("Done Syncing The Database");
         }
 
+        /// <summary>
+        /// Deletes the events from the local and remote DB
+        /// </summary>
+        /// <param name="myEvent">My event.</param>
+        /// <param name="connection">The connection.</param>
+        private void DeleteEvent(Event myEvent, MySqlConnection connection)
+        {
+            //Event Exists in DB and is older than the local DB. Update the remote
+
+            MySqlCommand cmd = new MySqlCommand(PermanentSettings.DELETE_EVENT_MYSQL, connection);
+            cmd.Parameters.AddWithValue("@key", myEvent.Key);
+
+            //Execute command
+            try
+            {
+                int affected = cmd.ExecuteNonQuery();
+                Console.WriteLine("");
+            }
+
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("Error Persistence.DoSync " + e.Message);
+            }
+
+            finally
+            {
+                this.CloseConnection();
+            }
+        }
+
+        /// <summary>
+        /// Gets any events that exist in the remote but not in the local.
+        /// </summary>
+        /// <param name="eventList">The event list.</param>
+        /// <param name="uid">The uid.</param>
+        /// <param name="main">The main.</param>
         private void GetEventsInRemote(List<Event> eventList,int uid, MainForm main)
         {
                
@@ -947,7 +986,7 @@ namespace Calendar
                     localDBConnection.Close();
                 }
 
-                main.refreshAllCell();
+                main.refreshAllCells(); //Cells were probably modified, so refresh them all.
             }
         }
     }

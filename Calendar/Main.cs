@@ -63,7 +63,7 @@ namespace Calendar
 
         }
 
-        public void refreshAllCell()
+        public void refreshAllCells()
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
