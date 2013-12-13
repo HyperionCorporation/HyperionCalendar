@@ -29,10 +29,7 @@ namespace Calendar
             SignIn.signIn = this;
             this.CenterToScreen();
             SignIn.mainForm = mainForm;
-            bw = new BackgroundWorker
-            {
-                WorkerReportsProgress = true,
-            };
+            bw = new BackgroundWorker();
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -55,10 +52,16 @@ namespace Calendar
             else
             {
                 //Threaded to prevent UI lockup
+                if (bw != null)
+                {
+                    bw = new BackgroundWorker();
+                }
+
                 if (!bw.IsBusy)
                 {
                     prgsLogin.Value = 0;
                     bw.DoWork += Login;
+                    bw.WorkerReportsProgress = true;
                     bw.ProgressChanged += bw_ProgressChanged;
                     bw.WorkerSupportsCancellation = true;
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);

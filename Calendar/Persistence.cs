@@ -722,7 +722,7 @@ namespace Calendar
             else
             {
                 MessageBox.Show("Error Connecting to Server", "Connection Error");
-                return Tuple.Create<bool, User>(true, null); ;
+                return Tuple.Create<bool, User>(false, null); ;
             }
 
         }
