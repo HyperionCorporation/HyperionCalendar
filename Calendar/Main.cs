@@ -31,7 +31,7 @@ namespace Calendar
             
 
             //Get user login
-            Form signIn = new SignIn(persistence);
+            Form signIn = new SignIn(persistence,this);
             DialogResult signInResult = signIn.ShowDialog();
             if (signInResult == DialogResult.OK)
             {
@@ -193,17 +193,28 @@ namespace Calendar
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string sa = persistence.GetMySQLServer();
-            Form settings = new SettingsFormsGeneral(sa, user.Name);
+            
+            Form settings = new SettingsFormsGeneral(persistence, user.Name);
             DialogResult result = settings.ShowDialog();
+        }
+
+        private void SyncButtonPressed(object sender, EventArgs e)
+        {
+            //Do a manual Sync
+            if (!sync.IsSyncing)
+            {
+                Thread ManualSyncThread = new Thread(new ThreadStart(sync.DoSync));
+                ManualSyncThread.Start();           
+            }
         }
 
     }
 
     public class Sync
     {
-        private Boolean doSync;
-        private Boolean running;
+        private bool doSync;
+        private bool running;
+        private bool blockSync;
         private Persistence persistence;
         private User user;
         private MainForm main;
@@ -212,23 +223,44 @@ namespace Calendar
         {
             doSync = false;
             running = true;
+            blockSync = false;
             this.persistence = persistence;
             this.user = user;
             this.main = main;
         }
 
+        public bool IsSyncing
+        {
+            get { return doSync; }
+        }
+
+        /// <summary>
+        /// Starts the synchronize loop
+        /// </summary>
         public void startSync()
         {
             while (running)
             {
-                if (doSync)
+                if (doSync && !blockSync)
                 {
-                    int? id = user.UID;
-                    int a = Convert.ToInt32(user.UID);
                     //Sync
                     persistence.DoSync(Convert.ToInt32(user.UID),main);                    
                     doSync = false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Does the manual synchronization
+        /// </summary>
+        public void DoSync()
+        {
+            if (!doSync)
+            {
+                blockSync = true;
+                //Make sure that there is no current sync event going on
+                persistence.DoSync(Convert.ToInt32(user.UID), main);
+                blockSync = false;
             }
         }
 

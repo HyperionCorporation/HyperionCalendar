@@ -16,14 +16,23 @@ namespace Calendar
 {
     public partial class SignIn : Form
     {
-        private Persistence persistence;
-        private User user;
+        public static Persistence persistence;
+        public static SignIn signIn;
+        public static User user;
+        public static BackgroundWorker bw;
+        public static MainForm mainForm;
 
-        public SignIn(Persistence persistence)
+        public SignIn(Persistence persistence,MainForm mainForm)
         {
             InitializeComponent();
-            this.persistence = persistence;
+            SignIn.persistence = persistence;
+            SignIn.signIn = this;
             this.CenterToScreen();
+            SignIn.mainForm = mainForm;
+            bw = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+            };
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -45,26 +54,50 @@ namespace Calendar
             }
             else
             {
-                StorageLocation loc = persistence.UserExists(txtUserLogin.Text.ToLower());
-
-                if (loc != StorageLocation.NULL)
-                {
-                    if (validateLogin(loc))
-                    {
-                        this.DialogResult = DialogResult.OK;
-                        this.Tag = user;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Wrong Password", "Login Error");
-                    }
-                }
-
-                else
-                {
-                    MessageBox.Show("User doesn't exist", "Login Error");
-                }
+                //Threaded to prevent UI lockup
+                bw.DoWork += Login;
+                bw.ProgressChanged += bw_ProgressChanged;
+                bw.RunWorkerAsync();                
             }
+        }
+
+        /// <summary>
+        /// Passed to the Thread Start as a paramter.
+        /// </summary>
+        /// <param name="info">The information.</param>
+        public static void Login(object sender, DoWorkEventArgs e)
+        {
+            string email = SignIn.signIn.txtUserLogin.Text;
+            SignIn.user = SignIn.persistence.GetUser(email);
+
+
+            StorageLocation loc = persistence.UserExists(SignIn.signIn.txtUserLogin.Text.ToLower());
+            bw.ReportProgress(50);
+            if (loc != StorageLocation.NULL)
+            {
+                if (SignIn.signIn.validateLogin(loc))
+                {
+                    bw.ReportProgress(100);
+                    SignIn.signIn.DialogResult = DialogResult.OK;
+                    SignIn.signIn.Tag = user;
+                }
+            
+            }
+
+            else
+            {
+                MessageBox.Show("User doesn't exist", "Login Error");
+            }
+        }
+
+        /// <summary>
+        /// Handles the ProgressChanged event of the bw control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ProgressChangedEventArgs"/> instance containing the event data.</param>
+        static void bw_ProgressChanged(object sender,ProgressChangedEventArgs e)
+        {
+            SignIn.signIn.prgsLogin.Value = e.ProgressPercentage;
         }
 
         //Attempts to validate the user's login
@@ -86,18 +119,26 @@ namespace Calendar
 
             else
             {
-                user = persistence.GetUser(txtUserLogin.Text);
-                HashAlgorithm algo = HashAlgorithm.Create("SHA512");
-                String enteredHashedPassword = User.hashPassword(txtPassword.Text, user.Salt)["hashedpassword"];
 
-                if (user.HashedPassword == enteredHashedPassword)
+                HashAlgorithm algo = HashAlgorithm.Create("SHA512");
+                String enteredHashedPassword = User.hashPassword(signIn.txtPassword.Text, SignIn.user.Salt)["hashedpassword"];
+                if (SignIn.user.HashedPassword == enteredHashedPassword)
                 {
                     MessageBox.Show("Login Succesful", "Login");
                     //Cache the user
-                    persistence.FlushCache();
-                    persistence.CacheUser(user);
-                    return true;
+                    SignIn.persistence.FlushCache();
+                    SignIn.persistence.CacheUser(SignIn.user);
+                    //Tell the app that it's ok to let them in. They're cool.
+                    signIn.DialogResult = DialogResult.OK;
+                    signIn.Tag = SignIn.user;
                 }
+
+                else
+                {
+                    MessageBox.Show("Incorrect Username/Password", "Login Error");
+                }
+                return false; //We need to wait for the thread to call a method
+
             }
 
             return false; //Change this if MySQL isn't working

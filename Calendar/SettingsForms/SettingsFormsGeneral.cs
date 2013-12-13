@@ -12,12 +12,13 @@ namespace Calendar
 {
     public partial class SettingsFormsGeneral : Form
     {
-        public SettingsFormsGeneral(string server, string username, string lastSync = "never")
+        public SettingsFormsGeneral(Persistence persistence, string username)
         {
             InitializeComponent();
-            lblServer.Text = server;
+            lblServer.Text = persistence.GetMySQLServer();
             lblUser.Text = username;
-            lblLastSync.Text = lastSync;
+            DateTime lastSync = persistence.GetLastSync();
+            lblLastSync.Text = lastSync.ToShortDateString() + " " + lastSync.ToShortTimeString();
         }
     }
 }

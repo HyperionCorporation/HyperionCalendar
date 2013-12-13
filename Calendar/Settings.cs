@@ -37,9 +37,7 @@ namespace Calendar
 
         public static readonly string SAVE_EVENT_SQLITE = "INSERT INTO events (name,begintime,endtime,location,description,user,timelastedit,uid,deleteEvent) VALUES(@name,@begintime,@endtime,@location,@description,@userid,@timelastedit,@uid,@delete)";
 
-        public static readonly string GET_EVENT_MYSQL = "SELECT * FROM events INNER JOIN users ON events.uid = @eventID WHERE user.uid = @userid";
-
-        public static readonly string GET_ALL_EVENTS_MYSQL = "SELECT * FROM events"; //Gets all the events
+        public static readonly string GET_EVENT_MYSQL = "SELECT * FROM events WHERE user=@user";//"SELECT * FROM events INNER JOIN users ON events.uid = @eventID WHERE user.uid = @userid";
         
         public static readonly string GET_EVENTS_SQLITE = "SELECT * FROM events where user = @uid";
 
@@ -57,7 +55,7 @@ namespace Calendar
 
         public static readonly string SYNC_REMOTE_WITH_LOCAL = "Update events set name=@name,begintime=@begintime,endtime=@endtime,location=@location,description=@description,timelastedit=@timelastedit,deleteEvent=@delete where uid=@uid";
         
-        public static readonly string GET_LAST_MODIFIED_TIME_MYSQL = "Select timelastedit from events where uid=@uid";
+        public static readonly string GET_LAST_MODIFIED_TIME_MYSQL = "SELECT timelastedit FROM events WHERE uid=@uid AND user=@userID";
     
     }
 }

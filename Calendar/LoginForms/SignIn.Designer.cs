@@ -106,7 +106,6 @@
             this.prgsLogin.Location = new System.Drawing.Point(16, 99);
             this.prgsLogin.Name = "prgsLogin";
             this.prgsLogin.Size = new System.Drawing.Size(233, 23);
-            this.prgsLogin.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.prgsLogin.TabIndex = 7;
             // 
             // SignIn

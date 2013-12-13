@@ -158,6 +158,11 @@ namespace Calendar
             return mysqlPersitance.Server;
         }
 
+        public DateTime GetLastSync()
+        {
+            return mysqlPersitance.GetLastSync();
+        }
+
         public bool CheckRemoteConnection()
         {
             return mysqlPersitance.CheckConnection();
@@ -184,6 +189,9 @@ namespace Calendar
         {
             Preperations();
         }
+
+       
+
 
         /*
         * Checks to see if a database already exists. If it is
@@ -467,11 +475,17 @@ namespace Calendar
         private string uid;
         private string password;
         private SQLitePersistance sqLitePersist;
+        private DateTime lastRun;
 
         public MySQLPersistence(SQLitePersistance sqLitePersist)
         {
             this.sqLitePersist = sqLitePersist;
             Initialize();
+        }
+
+        public DateTime GetLastSync()
+        {
+            return lastRun;
         }
 
         /// <summary>
@@ -485,7 +499,7 @@ namespace Calendar
             password = "EVeA53UptWrW3ehN";
 
             string connectionString = "SERVER=" + server + ";" + "DATABASE=" +
-            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";Connection Timeout=300000";
 
             connection = new MySqlConnection(connectionString);
         }
@@ -503,6 +517,7 @@ namespace Calendar
             {
                 try
                 {
+
                     connection.Open();
                     return true;
                 }
@@ -655,6 +670,7 @@ namespace Calendar
         public User GetUser(string userEmail)
         {
             string query = PermanentSettings.GET_USER_MYSQL;
+            
 
             //Open connection
             if (this.OpenConnection(connection) == true)
@@ -727,18 +743,18 @@ namespace Calendar
             //string getEventQuery = PermanentSettings.GET_EVENT_MYSQL;
             List<Tuple<bool, DateTime>> lastModifiedTimes = new List<Tuple<bool, DateTime>>(); //Store if it exists in rdb or not as well as the last updated Time.
 
-
+            //Build a list of events that exist in the remote.
             foreach (Event myEvent in eventList)
             {
                 //create command and assign the query and connection from the constructor
                 MySqlCommand cmd = new MySqlCommand(queryGetRemoteLastModifiedTime, connection);
                 cmd.Parameters.AddWithValue("@uid", myEvent.Key);
+                cmd.Parameters.AddWithValue("@userID", uid);
                 if (this.OpenConnection(connection) == true)
                 {
                     //Execute command
                     try
                     {
-                        cmd.ExecuteNonQuery();
                         MySqlDataReader dataReader = cmd.ExecuteReader();
 
                         if (dataReader.Read())
@@ -854,6 +870,8 @@ namespace Calendar
 
             GetEventsInRemote(eventList,uid,main); //Get events that exist in remote but not in local.
             Console.WriteLine("Done Syncing The Database");
+            lastRun = DateTime.Now;
+            
         }
 
         /// <summary>
@@ -900,7 +918,9 @@ namespace Calendar
             if (this.OpenConnection(connection) == true)
             {
                 //Create Command
-                MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_ALL_EVENTS_MYSQL, connection);
+                MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_EVENT_MYSQL, connection);
+                //@eventID WHERE user.uid = @userid
+                cmd.Parameters.AddWithValue("@user", uid);
                 MySqlDataReader dataReader = null;
                 //Create a data reader and Execute the command
                 try
