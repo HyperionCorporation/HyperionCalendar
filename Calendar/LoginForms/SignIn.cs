@@ -55,9 +55,16 @@ namespace Calendar
             else
             {
                 //Threaded to prevent UI lockup
-                bw.DoWork += Login;
-                bw.ProgressChanged += bw_ProgressChanged;
-                bw.RunWorkerAsync();                
+                if (!bw.IsBusy)
+                {
+                    prgsLogin.Value = 0;
+                    bw.DoWork += Login;
+                    bw.ProgressChanged += bw_ProgressChanged;
+                    bw.WorkerSupportsCancellation = true;
+                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+                    bw.RunWorkerAsync();
+                    btnLogin.Enabled = false;
+                }
             }
         }
 
@@ -67,27 +74,38 @@ namespace Calendar
         /// <param name="info">The information.</param>
         public static void Login(object sender, DoWorkEventArgs e)
         {
+            bw.ReportProgress(25);
             string email = SignIn.signIn.txtUserLogin.Text;
-            SignIn.user = SignIn.persistence.GetUser(email);
-
-
-            StorageLocation loc = persistence.UserExists(SignIn.signIn.txtUserLogin.Text.ToLower());
-            bw.ReportProgress(50);
-            if (loc != StorageLocation.NULL)
+            Tuple<bool,User> result = SignIn.persistence.GetUser(email);
+            bool didConnect = result.Item1;
+            SignIn.user = result.Item2;
+            if (didConnect)
             {
-                if (SignIn.signIn.validateLogin(loc))
+                bw.ReportProgress(50);
+                StorageLocation loc = persistence.UserExists(SignIn.signIn.txtUserLogin.Text.ToLower());
+                bw.ReportProgress(75);
+                if (loc != StorageLocation.NULL)
                 {
-                    bw.ReportProgress(100);
-                    SignIn.signIn.DialogResult = DialogResult.OK;
-                    SignIn.signIn.Tag = user;
-                }
-            
-            }
+                    if (SignIn.signIn.validateLogin(loc))
+                    {
+                        bw.ReportProgress(100);
+                        SignIn.signIn.DialogResult = DialogResult.OK;
+                        SignIn.signIn.Tag = user;
+                    }
 
-            else
-            {
-                MessageBox.Show("User doesn't exist", "Login Error");
+                }
+
+                else
+                {
+                    MessageBox.Show("User doesn't exist", "Login Error");
+                }
             }
+        }
+
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            btnLogin.Enabled = true;
+            prgsLogin.Value = 0;
         }
 
         /// <summary>

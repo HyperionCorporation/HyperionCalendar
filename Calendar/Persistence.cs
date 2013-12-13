@@ -81,7 +81,7 @@ namespace Calendar
 
             if (userCached == null)
             {
-                User user = mysqlPersitance.GetUser(email);
+                User user = mysqlPersitance.GetUser(email).Item2;
 
                 if (user != null)
                     return Location.MYSQL;
@@ -138,7 +138,7 @@ namespace Calendar
         /// </summary>
         /// <param name="email">The email.</param>
         /// <returns></returns>
-        public User GetUser(string email)
+        public Tuple<bool,User> GetUser(string email)
         {
             return mysqlPersitance.GetUser(email);
         }
@@ -499,7 +499,7 @@ namespace Calendar
             password = "EVeA53UptWrW3ehN";
 
             string connectionString = "SERVER=" + server + ";" + "DATABASE=" +
-            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";Connection Timeout=300000";
+            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
 
             connection = new MySqlConnection(connectionString);
         }
@@ -523,7 +523,11 @@ namespace Calendar
                 }
                 catch (MySqlException e)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error Opening Connection " + e.Message);
+                    if (e.Message == "Unable to connect to any of the specified MySQL hosts.")
+                    {
+                        //MessageBox.Show("Unable to Connecto to Server", "Connection Error");
+                        System.Diagnostics.Debug.WriteLine("Error Opening Connection " + e.Message);
+                    }
                     return false;
                 }
                 catch (Exception e)
@@ -666,8 +670,8 @@ namespace Calendar
         /// Gets the user from the Remote DB
         /// </summary>
         /// <param name="userEmail">The user email.</param>
-        /// <returns></returns>
-        public User GetUser(string userEmail)
+        /// <returns>A flag is you could connect or not, and the user</returns>
+        public Tuple<bool,User> GetUser(string userEmail)
         {
             string query = PermanentSettings.GET_USER_MYSQL;
             
@@ -699,12 +703,12 @@ namespace Calendar
                     }
                     
                     //return list to be displayed
-                    return returnUser;
+                    return Tuple.Create<bool,User>(true,returnUser);
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show("Exception " + e.Message, "Login Error");
-                    return null;
+                    return Tuple.Create<bool,User>(false,null); //Change this is you can login, and error still occurs
                 }
                 finally
                 {
@@ -718,7 +722,7 @@ namespace Calendar
             else
             {
                 MessageBox.Show("Error Connecting to Server", "Connection Error");
-                return null;
+                return Tuple.Create<bool, User>(true, null); ;
             }
 
         }
