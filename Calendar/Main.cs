@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Calendar
 {
@@ -17,7 +18,9 @@ namespace Calendar
         DateTime currentDateFirstOfMonth;
         private Persistence persistence;
         private User user;
-
+        private Thread syncThread;
+        private Sync sync;
+        private System.Threading.Timer timer;
 
         public MainForm()
         {
@@ -25,7 +28,7 @@ namespace Calendar
             this.FormBorderStyle = FormBorderStyle.Fixed3D;
             //Get persistence
             persistence = new Persistence();
-
+            
 
             //Get user login
             Form signIn = new SignIn(persistence);
@@ -49,7 +52,13 @@ namespace Calendar
                 Application.Exit();
             }
 
-
+            AutoResetEvent autoEvent = new AutoResetEvent(false);
+            sync = new Sync(persistence, user);
+            timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 1000, 120000);
+            syncThread = new Thread(new ThreadStart(sync.startSync));
+            syncThread.Name = "SyncThread";
+            syncThread.IsBackground = true;
+            syncThread.Start();
 
         }
 
@@ -174,6 +183,47 @@ namespace Calendar
             string sa = persistence.GetMySQLServer();
             Form settings = new SettingsFormsGeneral(sa, user.Name);
             DialogResult result = settings.ShowDialog();
+        }
+
+    }
+
+    public class Sync
+    {
+        private Boolean doSync;
+        private Boolean running;
+        private Persistence persistence;
+        private User user;
+
+        public Sync(Persistence persistence,User user)
+        {
+            doSync = false;
+            running = true;
+            this.persistence = persistence;
+            this.user = user;
+        }
+
+        public void startSync()
+        {
+            while (running)
+            {
+                if (doSync)
+                {
+                    int? id = user.UID;
+                    int a = Convert.ToInt32(user.UID);
+                    //Sync
+                    if (!persistence.DoSync(Convert.ToInt32(user.UID)))
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error Syncing");
+                    }
+                    doSync = false;
+                }
+            }
+        }
+
+        public void CheckStatus(Object stateInfo)
+        {
+            Console.WriteLine("Timer has ticked " + DateTime.Now.ToShortTimeString());
+            doSync = true;
         }
     }
 }

@@ -17,9 +17,11 @@ namespace Calendar
         public string description;
         public Rectangle rect;
         public bool drawn = false; //Keep track internally if the event has been drawn or not.
-        private int key; //Used in the Dictionary in DataFridViewCalendarCell
+        private long key; //Used in the Dictionary in DataFridViewCalendarCell and in the DB
+        private DateTime lastModified;
+        private bool deleteEvent;
 
-        public Event(string name, DateTime begin, DateTime end, string location, string description, int key)
+        public Event(string name, DateTime begin, DateTime end, string location, string description, long key, DateTime lastModified, bool deleteEvent)
         {
             this.name = name;
             this.begin = begin;
@@ -27,16 +29,30 @@ namespace Calendar
             this.location = location;
             this.description = description;
             this.key = key;
+            this.lastModified = lastModified;
+            this.deleteEvent = deleteEvent;
         }
 
-        public Event(int key)
+        public Event(long key)
         {
             this.key = key;
         }
 
-        public int Key
+        public long Key
         {
             get { return key; }
+        }
+
+        public bool DeleteEvent
+        {
+            get { return deleteEvent; }
+            set { deleteEvent = value; }
+        }
+
+        public DateTime LastModified
+        {
+            get { return lastModified; }
+            set { lastModified = value; }
         }
 
 

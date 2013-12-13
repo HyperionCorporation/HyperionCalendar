@@ -23,7 +23,28 @@ namespace Calendar
             this.mainForm = mainForm;
             this.persistence = persistence;
             this.user = user;
-             
+        }
+
+
+        public List<Event> GetEventsForMonth(DataGridView calendarView)
+        {
+            List<Event> theBigOne = new List<Event>();
+            foreach(DataGridViewRow row in calendarView.Rows)
+            {
+                foreach (DataGridViewCalendarCell cell in row.Cells)
+                {
+                    if (cell.date.Month == date.Month)
+                    {
+                        List<Event> eventsInCell = cell.GetEventsFromCell();
+                        foreach (Event myEvent in eventsInCell)
+                        {
+                            theBigOne.Add(myEvent);
+                        }
+                    }
+                }
+            }
+
+            return theBigOne;
         }
 
         //Generate the rows and columns for the Calendar

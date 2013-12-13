@@ -24,7 +24,7 @@ namespace Calendar
             InitializeComponent();
             this.editing = editing;
             random = new Random();
-            newEvent = new Event(random.Next());
+            newEvent = new Event(DateTime.Now.Ticks + random.Next());
 
             if (!editing)
             {
@@ -66,6 +66,7 @@ namespace Calendar
                 newEvent.description = txtBoxDescription.Text;
                 newEvent.begin = new DateTime(dtpBeginDate.Value.Year,dtpBeginDate.Value.Month,dtpBeginDate.Value.Day,dtpBeginTime.Value.Hour,dtpBeginTime.Value.Minute,dtpBeginTime.Value.Second); //Take the date and the time to make a correct DateTime obj
                 newEvent.end = new DateTime(dtpEndDate.Value.Year, dtpEndDate.Value.Month, dtpEndDate.Value.Day, dtpEndTime.Value.Hour, dtpEndTime.Value.Minute, dtpEndTime.Value.Second);
+                newEvent.LastModified = DateTime.Now;
                 this.Tag = newEvent;
                 this.DialogResult = DialogResult.OK;
             }
@@ -74,6 +75,7 @@ namespace Calendar
         private void btnDelete_Click(object sender, EventArgs e)
         {
             //Delete the event
+            newEvent.DeleteEvent = true;
             this.Tag = newEvent;
             this.DialogResult = DialogResult.No;
         }

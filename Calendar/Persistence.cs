@@ -52,10 +52,10 @@ namespace Calendar
         /// <param name="user">The user.</param>
         /// <param name="date">The date.</param>
         /// <returns></returns>
-        public Dictionary<int,Event> GetEvents(User user, DateTime date)
+        public Dictionary<long,Event> GetEvents(User user, DateTime date)
         {
             List<Event> BuildAList = sqlitePersitance.getEvents(user.UID);
-            Dictionary<int, Event> eventDict = new Dictionary<int, Event>();
+            Dictionary<long, Event> eventDict = new Dictionary<long, Event>();
             foreach(Event myEvent in BuildAList)
             {
                 if (myEvent.begin.Month == date.Month &&
@@ -147,8 +147,9 @@ namespace Calendar
         /// Deletes the event from the local DB. It should reflect to the remote when it updates. 
         /// </summary>
         /// <param name="deleteEvent">The delete event.</param>
-        public void DeleteEvent(Event deleteEvent)
+        private void DeleteEvent(Event deleteEvent)
         {
+            //Don't delete from Local DB here. 
             sqlitePersitance.DeleteEvent(deleteEvent);
         }
 
@@ -162,6 +163,12 @@ namespace Calendar
             return mysqlPersitance.CheckConnection();
         }
 
+        public bool DoSync(int uid)
+        {
+            List<Event> eventList = sqlitePersitance.getEvents(uid);
+            return mysqlPersitance.DoSync(eventList, uid);
+        }
+
     }
 
 
@@ -170,7 +177,7 @@ namespace Calendar
     /// </summary>
     class SQLitePersistance
     {
-        private const string localDatabase = "calendar.sqlite";
+        public static readonly string localDatabase = "calendar.sqlite";
         private SQLiteConnection localDBConnection;
 
         public SQLitePersistance()
@@ -211,6 +218,7 @@ namespace Calendar
             DateTime end = myEvent.end;
             string location = myEvent.location;
             string description = myEvent.description;
+            long key = myEvent.Key; //Key is generated with original event creation.
 
             try
             {
@@ -226,6 +234,9 @@ namespace Calendar
                 cmd.Parameters.Add(new SQLiteParameter("@location", location));
                 cmd.Parameters.Add(new SQLiteParameter("@description", description));
                 cmd.Parameters.Add(new SQLiteParameter("@userid", myUser.UID));
+                cmd.Parameters.Add(new SQLiteParameter("@timelastedit",DateTime.Now.Ticks));
+                cmd.Parameters.Add(new SQLiteParameter("@uid", key));
+                cmd.Parameters.Add(new SQLiteParameter("@delete",myEvent.DeleteEvent));
                 return cmd.ExecuteNonQuery();
             }
             finally
@@ -235,7 +246,7 @@ namespace Calendar
         }
 
         /// <summary>
-        /// Deletes an Event from the Local DB
+        /// Deletes an Event from the Local DB.
         /// </summary>
         /// <param name="deleteEvent">The delete event.</param>
         public void DeleteEvent(Event deleteEvent)
@@ -253,7 +264,7 @@ namespace Calendar
             }
             catch (Exception e)
             {
-
+                MessageBox.Show("Error Deleting Event " + e.Message, "Delete Error");
             }
             finally
             {
@@ -264,7 +275,7 @@ namespace Calendar
         /// <summary>
         /// Gets the event for a User from the SQLite DB
         /// </summary>
-        /// <param name="user">The user.</param>
+        /// <param name="user">The user id.</param>
         /// <returns></returns>
         public List<Event> getEvents(int? uid)
         {
@@ -288,8 +299,11 @@ namespace Calendar
                     long endtime = (long)reader["endtime"];
                     String location = (string)reader["location"];
                     String description = (string)reader["description"];
-                    var key = reader.GetInt32(0);
-                    eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description,(int)key));
+                    long timeLastModified = (long)reader["timelastedit"];
+                    long key = (long)reader["uid"];
+                    bool deleteEvent = Convert.ToBoolean(reader["deleteEvent"]);
+                    if(!deleteEvent)
+                        eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description, key, new DateTime(timeLastModified), deleteEvent));
                 }
 
             }
@@ -366,7 +380,8 @@ namespace Calendar
                 cmd.Parameters.AddWithValue("@description", myEvent.description);
                 cmd.Parameters.AddWithValue("@user", myUser.UID);
                 cmd.Parameters.AddWithValue("@id", myEvent.Key);
-
+                cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
+                cmd.Parameters.AddWithValue("@delete", myEvent.DeleteEvent);
                 int affected = cmd.ExecuteNonQuery();
                 Console.Write("");
             }
@@ -422,6 +437,7 @@ namespace Calendar
                 SQLiteCommand cmd = localDBConnection.CreateCommand();
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = PermanentSettings.CACHE_USER_SQLITE;
+                cmd.Parameters.Add(new SQLiteParameter("@id",user.UID));
                 cmd.Parameters.Add(new SQLiteParameter("@name", name));
                 cmd.Parameters.Add(new SQLiteParameter("@email", email.ToLower()));
                 cmd.Parameters.Add(new SQLiteParameter("@password", hashedPass));
@@ -441,6 +457,7 @@ namespace Calendar
             }
         }
     }
+
 
     class MySQLPersistence
     {
@@ -477,21 +494,30 @@ namespace Calendar
         /// <returns></returns>
         private bool OpenConnection()
         {
-            try
+            if (connection.State != System.Data.ConnectionState.Closed ||
+                connection.State != System.Data.ConnectionState.Broken ||
+                connection.State != System.Data.ConnectionState.Executing ||
+                connection.State != System.Data.ConnectionState.Fetching)
             {
-                connection.Open();
-                return true;
-            }
-            catch (MySqlException  e)
-            {
-                return false;
-            }
-            catch (Exception e)
-            {
-                if (e.Message == "The connection is already open.")
+                try
+                {
+                    connection.Open();
                     return true;
-                return false;
+                }
+                catch (MySqlException e)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error Opening Connection " + e.Message);
+                    return false;
+                }
+                catch (Exception e)
+                {
+                    if (e.Message == "The connection is already open.")
+                        return true;
+                    return false;
+                }
             }
+
+            return false;
         }
 
         /// <summary>
@@ -512,57 +538,7 @@ namespace Calendar
             }
         }
 
-        /// <summary>
-        /// Gets the event for user.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <returns></returns>
-        public List<Event> getEventForUser(User user)
-        {
-            string query = PermanentSettings.GET_EVENTS_MYSQL;
-            connection.Close();
-            //Open connection
-            if (this.OpenConnection() == true)
-            {
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@userid", user.UID);
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-                List<Event> eventList = new List<Event>();
-                Random rand = new Random();
-
-                //Read the data and store them in the list
-                if (dataReader.Read())
-                {
-                    String name = (string)dataReader["name"];
-                    long begintime = (long)dataReader["begintime"];
-                    long endtime = (long)dataReader["endtime"];
-                    String location = (string)dataReader["location"];
-                    String description = (string)dataReader["description"];
-
-                    eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description, rand.Next(100)));
-                }
-
-
-
-                //close Data Reader
-                dataReader.Close();
-
-                //close Connection
-                this.CloseConnection();
-
-                //return list to be displayed
-                return eventList;
-            }
-
-            else
-            {
-                MessageBox.Show("Error Connecting to Server", "Connection Error");
-                return null;
-            }
-        }
-
+       
         /// <summary>
         /// Saves the event to the MySQL Database
         /// </summary>
@@ -576,6 +552,7 @@ namespace Calendar
             DateTime end = myEvent.end;
             string location = myEvent.location;
             string description = myEvent.description;
+            long key = myEvent.Key; //Get the key and save it to db.
             string query = PermanentSettings.SAVE_EVENT_MYSQL;
 
             if (this.OpenConnection())
@@ -588,6 +565,8 @@ namespace Calendar
                 cmd.Parameters.AddWithValue("@location", location);
                 cmd.Parameters.AddWithValue("@description", description);
                 cmd.Parameters.AddWithValue("@userid", user.UID);
+                cmd.Parameters.AddWithValue("@timelastedit", DateTime.Now.Ticks);
+                cmd.Parameters.AddWithValue("@uid", key);
                 //Execute command
                 cmd.ExecuteNonQuery();
 
@@ -733,5 +712,237 @@ namespace Calendar
         }
 
 
+        /// <summary>
+        /// Does the synchronize between MySQL and SQLite
+        /// </summary>
+        /// <param name="eventList">The event list.</param>
+        public bool DoSync(List<Event> eventList, int uid)
+        {
+            Console.WriteLine("Syncing The Database");
+            string querySync = PermanentSettings.SYNC_REMOTE_WITH_LOCAL;
+            string queryInsert = PermanentSettings.SAVE_EVENT_MYSQL;
+            string queryGetRemoteLastModifiedTime = PermanentSettings.GET_LAST_MODIFIED_TIME_MYSQL;
+            string getEventQuery = PermanentSettings.GET_EVENT_MYSQL;
+            List<Tuple<bool, DateTime>> lastModifiedTimes = new List<Tuple<bool, DateTime>>(); //Store if it exists in rdb or not as well as the last updated Time.
+
+
+            foreach (Event myEvent in eventList)
+            {
+                //create command and assign the query and connection from the constructor
+                MySqlCommand cmd = new MySqlCommand(queryGetRemoteLastModifiedTime, connection);
+                cmd.Parameters.AddWithValue("@uid", myEvent.Key);
+                if (this.OpenConnection() == true)
+                {
+                    //Execute command
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        MySqlDataReader dataReader = cmd.ExecuteReader();
+
+                        if (dataReader.Read())
+                        {
+                            long lastModifeidRaw = Convert.ToInt64(dataReader["timelastedit"]);
+                            lastModifiedTimes.Add(Tuple.Create(true, new DateTime(lastModifeidRaw))); //A result was returned, it exists. 
+                        }
+
+                        else
+                        {
+                            lastModifiedTimes.Add(Tuple.Create(false, new DateTime(0)));
+                        }
+                    }
+
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error Persistence.GetLastEditedTime " + e.Message);
+                        return false;
+                    }
+
+                    finally
+                    {
+                        this.CloseConnection();
+                    }
+                }
+
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Error Connecting to DB", "Connection Error");
+                }
+            }
+
+
+
+            int index = 0;
+            foreach (Event myEvent in eventList)
+            {
+                //Update the remote if it is behind the local.
+                if (this.OpenConnection() == true)
+                {
+                    if (lastModifiedTimes[index].Item1 && myEvent.LastModified > lastModifiedTimes[index].Item2)
+                    {
+                        //Event Exists in DB and is older than the local DB
+                        index++;
+                        MySqlCommand cmd = new MySqlCommand(querySync, connection);
+                        cmd.Parameters.AddWithValue("@name", myEvent.name);
+                        cmd.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
+                        cmd.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
+                        cmd.Parameters.AddWithValue("@location", myEvent.location);
+                        cmd.Parameters.AddWithValue("@description", myEvent.description);
+                        cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
+                        cmd.Parameters.AddWithValue("@uid", myEvent.Key);
+
+                        //Execute command
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Error Persistence.DoSync " + e.Message);
+                            return false;
+                        }
+
+                        finally
+                        {
+                            this.CloseConnection();
+                        }
+                    }
+                    else if (!lastModifiedTimes[index].Item1)
+                    {
+                        //Event doesn't exist at remote DB
+                        MySqlCommand cmd = new MySqlCommand(queryInsert, connection);
+                        cmd.Parameters.AddWithValue("@name", myEvent.name);
+                        cmd.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
+                        cmd.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
+                        cmd.Parameters.AddWithValue("@location", myEvent.location);
+                        cmd.Parameters.AddWithValue("@description", myEvent.description);
+                        cmd.Parameters.AddWithValue("@userid", uid);
+                        cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
+                        cmd.Parameters.AddWithValue("@uid", myEvent.Key);
+                        index++;
+                        //Execute command
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Error Persistence.DoSync " + e.Message);
+                            return false;
+                        }
+                        //close connection
+                        finally
+                        {
+                            this.CloseConnection();
+                        }
+
+                    }
+                }
+
+                else
+                {
+                    return false;
+                }
+            }
+
+            GetEventsInRemote(eventList,uid);
+            Console.WriteLine("Done Syncing The Database");
+
+            return true;
+        }
+
+        private void GetEventsInRemote(List<Event> eventList,int uid)
+        {
+               
+            List<Event> returnedEvents = new List<Event>();
+            //GET_ALL_EVENTS_MYSQL
+            //Get all the events in the Remote DB
+            //Open connection
+            if (this.OpenConnection() == true)
+            {
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_ALL_EVENTS_MYSQL, connection);
+                MySqlDataReader dataReader = null;
+                //Create a data reader and Execute the command
+                try
+                {
+                    dataReader = cmd.ExecuteReader();
+                    //Read the data and store them in the list
+                    if (dataReader.Read())
+                    {
+                        string name = Convert.ToString(dataReader["name"]);
+                        long beginTime = Convert.ToInt64(dataReader["begintime"]);
+                        long endtime = Convert.ToInt64(dataReader["endtime"]);
+                        string location = Convert.ToString(dataReader["location"]);
+                        string description = Convert.ToString(dataReader["description"]);
+                        int userID = Convert.ToInt32(dataReader["user"]);
+                        long timelastedit = Convert.ToInt64(dataReader["timelastedit"]);
+                        long uniqueID = Convert.ToInt64(dataReader["uid"]);
+
+                        returnedEvents.Add(new Event(name, new DateTime(beginTime), new DateTime(endtime), location, description, uniqueID, new DateTime(timelastedit), false));
+                    }
+
+            
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Exception " + e.Message, "MySQL Error");
+                }
+                finally
+                {
+                    //close Data Reader
+                    if (dataReader != null)
+                        dataReader.Close();
+                    //close Connection
+                    this.CloseConnection();
+                }
+            }
+
+            //Remove any Events that are are on both the remote and local. 
+
+            for (int i = 0; i < returnedEvents.Count; i++)
+            {
+                foreach(Event myEvent  in eventList)
+                {
+                    if (returnedEvents[i].Key == myEvent.Key)
+                        returnedEvents.RemoveAt(i);
+                }
+            }
+
+            SQLiteConnection localDBConnection = new SQLiteConnection("Data Source=" + SQLitePersistance.localDatabase + ";Version=3;");
+
+            //Save the events that remain in the local DB
+            foreach (Event myEvent in returnedEvents)
+            {
+                try
+                {
+                    localDBConnection.Open();
+                   
+                    SQLiteCommand cmdLocal = localDBConnection.CreateCommand();
+                    cmdLocal.CommandType = System.Data.CommandType.Text;
+                    cmdLocal.CommandText = PermanentSettings.SAVE_EVENT_SQLITE;
+                    cmdLocal.Parameters.AddWithValue("@name", myEvent.name);
+                    cmdLocal.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
+                    cmdLocal.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
+                    cmdLocal.Parameters.AddWithValue("@location", myEvent.location);
+                    cmdLocal.Parameters.AddWithValue("@description", myEvent.description);
+                    cmdLocal.Parameters.AddWithValue("@uid", myEvent.Key);
+                    cmdLocal.Parameters.AddWithValue("@userid", uid);
+                    cmdLocal.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
+                    cmdLocal.Parameters.AddWithValue("@delete", false);
+                    int affected = cmdLocal.ExecuteNonQuery();
+                    Console.Write("");
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error Pulling Events: " + e.Message);
+                }
+                finally
+                {
+                    localDBConnection.Close();
+                }
+            }
+        }
     }
 }

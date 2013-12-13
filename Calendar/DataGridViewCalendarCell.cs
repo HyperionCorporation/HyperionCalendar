@@ -12,7 +12,7 @@ namespace Calendar
 {
     public partial class DataGridViewCalendarCell : DataGridViewTextBoxCell
     {
-        Dictionary<int, Event> events = null;
+        Dictionary<long, Event> events = null;
         int rectCount = 0;
         int rectIndex = 0;
         Point cursorPosition;
@@ -27,7 +27,7 @@ namespace Calendar
             InitializeComponent();
             this.parent = this.DataGridView;
             brush = new SolidBrush(Color.FromArgb(128,Color.Blue));
-            events = new Dictionary<int,Event>();
+            events = new Dictionary<long,Event>();
             this.Value = Value;
             this.date = date;
             this.persistence = persistence;
@@ -52,7 +52,7 @@ namespace Calendar
                 advancedBorderStyle, paintParts);
 
            
-                    foreach(KeyValuePair<int,Event> calendarEvent in events)
+                    foreach(KeyValuePair<long,Event> calendarEvent in events)
                     {
                         if (!calendarEvent.Value.drawn)
                         {
@@ -65,7 +65,7 @@ namespace Calendar
                     }
                     
 
-            foreach (KeyValuePair<int,Event> entry in events)
+            foreach (KeyValuePair<long,Event> entry in events)
             {
                 graphics.DrawRectangle(Pens.Blue, entry.Value.rect);
                 graphics.FillRectangle(brush, entry.Value.rect);
@@ -81,7 +81,7 @@ namespace Calendar
             this.ContextMenuStrip = new ContextMenuStrip();
             LoadEvents();
             List<ToolStripItem> tsItems = new List<ToolStripItem>();
-            foreach (KeyValuePair<int, Event> myEvent in events)
+            foreach (KeyValuePair<long, Event> myEvent in events)
             {
                 ToolStripItem myTSItem = new ToolStripMenuItem();
                 myTSItem.Text = myEvent.Value.name;
@@ -171,7 +171,7 @@ namespace Calendar
         /// <returns></returns>
         private Event checkEvent(Point cursorPosition)
         {
-            foreach (KeyValuePair<int,Event> calendarEvent in events)
+            foreach (KeyValuePair<long,Event> calendarEvent in events)
             {
                 if (calendarEvent.Value.rect.Contains(cursorPosition))
                 {
@@ -180,6 +180,17 @@ namespace Calendar
             }
 
             return null;
+        }
+
+        public List<Event> GetEventsFromCell()
+        {
+            List<Event> eventList = new List<Event>();
+            foreach (KeyValuePair<long, Event> pair in events)
+            {
+                eventList.Add(pair.Value);
+            }
+
+            return eventList;
         }
 
         /// <summary>
@@ -195,7 +206,8 @@ namespace Calendar
                 //Delete the event
                 Event deleteEvent = (Event)editEvent.Tag;
                 events.Remove(deleteEvent.Key);
-                persistence.DeleteEvent(deleteEvent);
+                persistence.EditEvent(deleteEvent, user);
+                //persistence.DeleteEvent(deleteEvent);
                 this.DataGridView.InvalidateCell(this);
             }
 
