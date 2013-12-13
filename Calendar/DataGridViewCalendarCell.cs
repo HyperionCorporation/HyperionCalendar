@@ -21,6 +21,7 @@ namespace Calendar
         private Persistence persistence;
         private User user;
         private DataGridView parent;
+        private bool hasOverlapped;
 
         public DataGridViewCalendarCell(DateTime date, Object Value, Persistence persistence, User user)
         {
@@ -32,6 +33,7 @@ namespace Calendar
             this.date = date;
             this.persistence = persistence;
             this.user = user;
+            this.hasOverlapped = false;
             LoadEvents();
         }
 
@@ -64,6 +66,8 @@ namespace Calendar
                             calendarEvent.Value.rect.Width = cellBounds.Width - 4;
                             calendarEvent.Value.rect.Height = cellBounds.Height - 90;
                             calendarEvent.Value.drawn = true;
+
+                            checkBoxOverlap();
                         }
                     }
                     
@@ -84,6 +88,7 @@ namespace Calendar
             this.ContextMenuStrip = new ContextMenuStrip();
             LoadEvents();
             List<ToolStripItem> tsItems = new List<ToolStripItem>();
+            MessageBox.Show("Overlap? " + hasOverlapped);
             foreach (KeyValuePair<long, Event> myEvent in events)
             {
                 ToolStripItem myTSItem = new ToolStripMenuItem();
@@ -212,7 +217,6 @@ namespace Calendar
                 persistence.EditEvent(deleteEvent, user);
                 //persistence.DeleteEvent(deleteEvent);
                 this.DataGridView.InvalidateCell(this);
-                checkBoxOverlap(editEvent);
             }
 
             else if (editEventResult == DialogResult.OK)
@@ -231,28 +235,31 @@ namespace Calendar
                         cell.LoadEvents();
                     }
                 }
-                checkBoxOverlap(editEvent);
                 
             }
             
         }
-        public void checkBoxOverlap(Form editEvent)
+        public void checkBoxOverlap()
         {
-            Event editedEvent = (Event)editEvent.Tag;
-            int eventY = editedEvent.rect.Y;
-            int heighttotal = editedEvent.rect.Y + editedEvent.rect.Height;
             List<Event> eventList = GetEventsFromCell();
             foreach (Event events in eventList)
             {
-                int height = events.rect.Y + events.rect.Height;
-                if (eventY < height && eventY >= events.rect.Y)
+                foreach (Event myEvent in eventList)
                 {
-                    MessageBox.Show("Note: this event box will overlap with another event box. \n Right click on a day to show all events in that day.", "Formating Alert");
-                }
-                if (heighttotal < height && heighttotal >= events.rect.Y)
-                {
+                    if (events.Key != myEvent.Key && events.rect.Contains(myEvent.rect))
+                    {
+                        events.OverLapped = true;
+                        myEvent.OverLapped = true;
+                        this.hasOverlapped = true;
+                    }
 
-                    MessageBox.Show("Note: this event box will overlap with another event box. \n Right click on a day to show all events in that day.", "Formating Alert");
+
+                    else if (events.Key != myEvent.Key)
+                    {
+                        events.OverLapped = false;
+                        myEvent.OverLapped = false;
+                        this.hasOverlapped = false;
+                    }
                 }
             }
         }

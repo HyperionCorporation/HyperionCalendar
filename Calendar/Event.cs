@@ -20,6 +20,7 @@ namespace Calendar
         private long key; //Used in the Dictionary in DataFridViewCalendarCell and in the DB
         private DateTime lastModified;
         private bool deleteEvent;
+        private bool overLapped; //Is there any event over or under it
 
         public Event(string name, DateTime begin, DateTime end, string location, string description, long key, DateTime lastModified, bool deleteEvent)
         {
@@ -31,6 +32,7 @@ namespace Calendar
             this.key = key;
             this.lastModified = lastModified;
             this.deleteEvent = deleteEvent;
+            this.overLapped = false;
         }
 
         public Event(long key)
@@ -41,6 +43,12 @@ namespace Calendar
         public long Key
         {
             get { return key; }
+        }
+
+        public bool OverLapped
+        {
+            get{return overLapped;}
+            set{overLapped = value; }
         }
 
         public bool DeleteEvent
