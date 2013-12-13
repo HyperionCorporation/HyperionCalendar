@@ -212,6 +212,7 @@ namespace Calendar
                 persistence.EditEvent(deleteEvent, user);
                 //persistence.DeleteEvent(deleteEvent);
                 this.DataGridView.InvalidateCell(this);
+                checkBoxOverlap(editEvent);
             }
 
             else if (editEventResult == DialogResult.OK)
@@ -229,6 +230,29 @@ namespace Calendar
                         DataGridView.InvalidateCell(cell);
                         cell.LoadEvents();
                     }
+                }
+                checkBoxOverlap(editEvent);
+                
+            }
+            
+        }
+        public void checkBoxOverlap(Form editEvent)
+        {
+            Event editedEvent = (Event)editEvent.Tag;
+            int eventY = editedEvent.rect.Y;
+            int heighttotal = editedEvent.rect.Y + editedEvent.rect.Height;
+            List<Event> eventList = GetEventsFromCell();
+            foreach (Event events in eventList)
+            {
+                int height = events.rect.Y + events.rect.Height;
+                if (eventY < height && eventY >= events.rect.Y)
+                {
+                    MessageBox.Show("Note: this event box will overlap with another event box. \n Right click on a day to show all events in that day.", "Formating Alert");
+                }
+                if (heighttotal < height && heighttotal >= events.rect.Y)
+                {
+
+                    MessageBox.Show("Note: this event box will overlap with another event box. \n Right click on a day to show all events in that day.", "Formating Alert");
                 }
             }
         }
