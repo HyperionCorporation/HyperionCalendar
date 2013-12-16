@@ -3,9 +3,158 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Calendar
 {
+
+    static class Settings
+    {
+        private static Color cellBackground = System.Drawing.Color.White;
+        private static Color cellHighlight = System.Drawing.Color.Blue;
+        private static Color currentDayColor = System.Drawing.Color.DarkSlateGray;
+        private static Color otherMonthColor = System.Drawing.Color.LightGoldenrodYellow;
+
+
+        private static int syncInterval = 30; //In Minutes
+        private static string address = "bryantp.com";
+        private static int port = 3306;
+        private static string userSQL = "calendarUser";
+        private static string password = "EVeA53UptWrW3ehN";
+        private static string database = "calendar";
+
+        public static void ReadSettings()
+        {
+            var doc = XDocument.Load("settings.xml");
+            var settings = doc.Descendants("Settings");
+            var serverSettings = settings.Descendants("Server");
+            var colorSettings = settings.Descendants("Colors");
+
+            foreach (XElement setting in serverSettings)
+            {
+                if (setting.Name.LocalName == "SyncInterval")
+                    SyncInterval = Convert.ToInt64(setting.Value);
+                else if (setting.Name.LocalName == "Address")
+                    address = setting.Value;
+                else if (setting.Name.LocalName == "Port")
+                    port = Convert.ToInt32(setting.Value);
+                else if (setting.Name.LocalName == "Password")
+                    password = setting.Value;
+            }
+
+            foreach (XElement setting in colorSettings)
+            {
+                if (setting.Name.LocalName == "CellBackground")
+                    cellBackground = Color.FromName(setting.Value);
+                else if (setting.Name.LocalName == "CellHighlight")
+                    cellHighlight = Color.FromName(setting.Value);
+                else if (setting.Name.LocalName == "CurrentDayColor")
+                    currentDayColor = Color.FromName(setting.Value);
+                else if (setting.Name.LocalName == "OtherMonthColor")
+                    otherMonthColor = Color.FromName(setting.Value);
+            }
+
+
+        }
+
+        public static Color CellBackground
+        {
+            get { return cellBackground; }
+            set { cellBackground = value; }
+        }
+
+        public static Color CellHighlight
+        {
+            get { return cellHighlight; }
+            set { cellHighlight = value; }
+        }
+
+        public static Color CurrentDayColor
+        {
+            get { return currentDayColor; }
+            set { currentDayColor = value; }
+        }
+
+        public static Color OtherMonthColor
+        {
+            get { return otherMonthColor; }
+            set { otherMonthColor = value; }
+        }
+
+        public static string Address
+        {
+            get { return address; }
+            set { address = value; }
+        }
+
+        public static int Port
+        {
+            get { return port; }
+            set { port = value; }
+        }
+
+        public static string ServerUser
+        {
+            get { return userSQL; }
+            set { userSQL = value; }
+        }
+
+        public static string Password
+        {
+            get { return password; }
+            set { password = value; }
+        }
+
+        public static string DataBase
+        {
+            get { return database; }
+            set { database = value; }
+        }
+
+        public static void WriteDefaultSettings()
+        {
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            using (XmlWriter writer = XmlWriter.Create("settings.xml",settings))
+            {
+            
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Settings");
+                
+                //Server settings
+                writer.WriteStartElement("Server");
+                writer.WriteElementString("SyncInterval", Convert.ToString(SyncInterval));
+                writer.WriteElementString("Address", address);
+                writer.WriteElementString("Port", Convert.ToString(port));
+                writer.WriteElementString("Password", password);
+                writer.WriteEndElement();
+
+                //Color settings
+                writer.WriteStartElement("Colors");
+                writer.WriteElementString("CellBackground", cellBackground.ToString());
+                writer.WriteElementString("CellHighlight", cellHighlight.ToString());
+                writer.WriteElementString("CurrentDayColor", currentDayColor.ToString());
+                writer.WriteElementString("OtherMonthColor", otherMonthColor.ToString());
+                writer.WriteEndElement();
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+        }
+
+        public static long SyncInterval
+        {
+            get{return syncInterval * 30 * 100;}
+            set
+            {  
+                syncInterval = (int)(value/(30L*100L));
+            }
+        }
+   
+    }
+
     static class PermanentSettings
     {
         public static readonly string CREATE_EVENTS_TABLE_SQLITE = "create table events (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT," +
@@ -37,7 +186,7 @@ namespace Calendar
 
         public static readonly string SAVE_EVENT_SQLITE = "INSERT INTO events (name,begintime,endtime,location,description,user,timelastedit,uid,deleteEvent) VALUES(@name,@begintime,@endtime,@location,@description,@userid,@timelastedit,@uid,@delete)";
 
-        public static readonly string GET_EVENT_MYSQL = "SELECT * FROM events WHERE user=@user";//"SELECT * FROM events INNER JOIN users ON events.uid = @eventID WHERE user.uid = @userid";
+        public static readonly string GET_EVENTS_MYSQL = "SELECT * FROM events WHERE user=@user";//"SELECT * FROM events INNER JOIN users ON events.uid = @eventID WHERE user.uid = @userid";
         
         public static readonly string GET_EVENTS_SQLITE = "SELECT * FROM events where user = @uid";
 

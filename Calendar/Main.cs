@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
 
 namespace Calendar
 {
@@ -36,7 +37,7 @@ namespace Calendar
             {
                 currentDate = DateTime.Now;
                 currentDateFirstOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
-
+                DoSettingsWork();
                 //Calendar starts on todays date
                 lblMonthYear.Text = getDateString(DateTime.Now);
                 user = (User)signIn.Tag;
@@ -60,6 +61,25 @@ namespace Calendar
             syncThread.IsBackground = true;
             syncThread.Start();
 
+            dataGridView1.BackgroundColor = Settings.CellBackground;
+            dataGridView1.RowsDefaultCellStyle.SelectionBackColor = Settings.CellHighlight;
+
+        }
+
+        /// <summary>
+        /// Checks to see if there is a settings file. Creates one if there isn't or loads from the existing one. 
+        /// </summary>
+        private void DoSettingsWork()
+        {
+            //Check to see if the existing settings file is there. 
+            if (File.Exists("settings.xml"))
+            {
+                Settings.ReadSettings();
+            }
+            else
+            {
+                Settings.WriteDefaultSettings();
+            }
         }
 
         public void refreshAllCells()
@@ -252,7 +272,7 @@ namespace Calendar
                 if (doSync && !blockSync)
                 {
                     //Sync
-                    persistence.DoSync(Convert.ToInt32(user.UID),main);                    
+                    persistence.DoSync(user,main);                    
                     doSync = false;
                 }
             }
@@ -267,7 +287,7 @@ namespace Calendar
             {
                 blockSync = true;
                 //Make sure that there is no current sync event going on
-                persistence.DoSync(Convert.ToInt32(user.UID), main);
+                persistence.DoSync(user, main);
                 blockSync = false;
             }
         }

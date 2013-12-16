@@ -126,6 +126,11 @@ namespace Calendar
             set { uid = value; }
         }
 
+        public bool IsCached
+        {
+            get { return isCached; }
+        }
+
         public static bool operator == (User left, User right)
         {
             if(Object.Equals(left,null))

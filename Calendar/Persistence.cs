@@ -176,10 +176,10 @@ namespace Calendar
             return mysqlPersitance.CheckConnection();
         }
 
-        public void DoSync(int uid,MainForm main)
+        public void DoSync(User user,MainForm main)
         {
-            List<Event> eventList = sqlitePersitance.getEvents(uid);
-            mysqlPersitance.DoSync(eventList, uid,main);
+            List<Event> eventList = sqlitePersitance.getEvents(user.UID);
+            mysqlPersitance.DoSync(eventList, user,main);
         }
 
     }
@@ -434,6 +434,31 @@ namespace Calendar
         }
 
         /// <summary>
+        /// Deletes the local event Cache
+        /// </summary>
+        public void DeleteEventCache()
+        {
+            try
+            {
+                localDBConnection = new SQLiteConnection("Data Source=" + localDatabase + ";Version=3;");
+                localDBConnection.Open();
+
+                SQLiteCommand cmd = localDBConnection.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = PermanentSettings.FLUSH_EVENT_CACHE;
+                int rows = (int)cmd.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error Deleting Cached Events: " + e.Message);
+            }
+            finally
+            {
+                localDBConnection.Close();
+            }
+        }
+
+        /// <summary>
         /// Caches the in the local DB
         /// </summary>
         /// <param name="user">The user.</param>
@@ -501,13 +526,13 @@ namespace Calendar
         /// </summary>
         private void Initialize()
         {
-            server = "bryantp.com";
-            database = "calendar";
-            uid = "calendarUser";
-            password = "EVeA53UptWrW3ehN";
-
-            string connectionString = "SERVER=" + server + ";" + "DATABASE=" +
-            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+            server = Settings.Address;
+            database = Settings.DataBase;
+            uid = Settings.ServerUser;
+            password = Settings.Password;
+            string port = Convert.ToString(Settings.Port);
+            string connectionString = "SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};";
+            connectionString = String.Format(connectionString, server, database, uid, password, port);
 
             connection = new MySqlConnection(connectionString);
         }
@@ -746,7 +771,7 @@ namespace Calendar
         /// <param name="eventList">The event list.</param>
         /// <param name="uid">The uid of the current User</param>
         /// <param name="main">The mainProgram class</param>
-        public void DoSync(List<Event> eventList, int uid, MainForm main)
+        public void DoSync(List<Event> eventList, User user, MainForm main)
         {
             Console.WriteLine("Syncing The Database");
             string querySync = PermanentSettings.SYNC_REMOTE_WITH_LOCAL;
@@ -761,7 +786,7 @@ namespace Calendar
                 //create command and assign the query and connection from the constructor
                 MySqlCommand cmd = new MySqlCommand(queryGetRemoteLastModifiedTime, connection);
                 cmd.Parameters.AddWithValue("@uid", myEvent.Key);
-                cmd.Parameters.AddWithValue("@userID", uid);
+                cmd.Parameters.AddWithValue("@userID", user.UID);
                 if (this.OpenConnection(connection) == true)
                 {
                     //Execute command
@@ -851,7 +876,7 @@ namespace Calendar
                         cmd.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
                         cmd.Parameters.AddWithValue("@location", myEvent.location);
                         cmd.Parameters.AddWithValue("@description", myEvent.description);
-                        cmd.Parameters.AddWithValue("@userid", uid);
+                        cmd.Parameters.AddWithValue("@userid", user.UID);
                         cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
                         cmd.Parameters.AddWithValue("@uid", myEvent.Key);
                         cmd.Parameters.AddWithValue("@delete", myEvent.DeleteEvent);
@@ -880,7 +905,7 @@ namespace Calendar
   
             }
 
-            GetEventsInRemote(eventList,uid,main); //Get events that exist in remote but not in local.
+            GetEventsInRemote(eventList,user,main); //Get events that exist in remote but not in local.
             Console.WriteLine("Done Syncing The Database");
             lastRun = DateTime.Now;
             
@@ -922,7 +947,7 @@ namespace Calendar
         /// <param name="eventList">The event list.</param>
         /// <param name="uid">The uid.</param>
         /// <param name="main">The main.</param>
-        private void GetEventsInRemote(List<Event> eventList,int uid, MainForm main)
+        private void GetEventsInRemote(List<Event> eventList,User user, MainForm main)
         {
                
             List<Event> returnedEvents = new List<Event>();
@@ -930,9 +955,15 @@ namespace Calendar
             if (this.OpenConnection(connection) == true)
             {
                 //Create Command
-                MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_EVENT_MYSQL, connection);
+                MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_EVENTS_MYSQL, connection);
+
+                if (user.IsCached)
+                {
+                    //Delete Events in the database. This destroys any other users unsaved events. 
+                    sqLitePersist.DeleteEventCache();
+                }
                 //@eventID WHERE user.uid = @userid
-                cmd.Parameters.AddWithValue("@user", uid);
+                cmd.Parameters.AddWithValue("@user", user.UID);
                 MySqlDataReader dataReader = null;
                 //Create a data reader and Execute the command
                 try
@@ -1003,7 +1034,7 @@ namespace Calendar
                     cmdLocal.Parameters.AddWithValue("@location", myEvent.location);
                     cmdLocal.Parameters.AddWithValue("@description", myEvent.description);
                     cmdLocal.Parameters.AddWithValue("@uid", myEvent.Key);
-                    cmdLocal.Parameters.AddWithValue("@userid", uid);
+                    cmdLocal.Parameters.AddWithValue("@userid", user.UID);
                     cmdLocal.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
                     cmdLocal.Parameters.AddWithValue("@delete", false);
                     int affected = cmdLocal.ExecuteNonQuery();

@@ -13,8 +13,6 @@ namespace Calendar
     public partial class DataGridViewCalendarCell : DataGridViewTextBoxCell
     {
         Dictionary<long, Event> events = null;
-        int rectCount = 0;
-        int rectIndex = 0;
         Point cursorPosition;
         SolidBrush brush;
         public DateTime date;
