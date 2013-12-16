@@ -31,9 +31,9 @@ namespace Calendar
                 this.btnDelete.Enabled = false;
                 //Fill in the DateTime values with things that make sense. 
                 dtpBeginDate.Value = date;
-                dtpEndDate.Value = DateTime.Today;
+                dtpEndDate.Value = date.AddDays(1);
                 dtpBeginTime.Value = date;
-                dtpEndTime.Value = DateTime.Now;
+                dtpEndTime.Value = date;
             }
             
         }
