@@ -300,7 +300,7 @@ namespace Calendar
                     if (dateInCell.Day == date.Day && dateInCell.Month == DateTime.Now.Month && dateInCell.Year == DateTime.Now.Year)
                     {
                         //cell.Selected = true;
-                        cell.Style.BackColor = System.Drawing.Color.DarkSlateGray;
+                        cell.Style.BackColor = Settings.CurrentDayColor;
                         break; //In case today is the first, don't want to highlight it twice
                     }
                 }
@@ -330,7 +330,7 @@ namespace Calendar
 
                     while (currentCellDate != 1)
                     {
-                        cell.Style.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+                        cell.Style.BackColor = Settings.OtherMonthColor;
                         index++;
                         if (index > 6)
                             break;
