@@ -49,6 +49,8 @@ namespace Calendar
 
         public static readonly string FLUSH_CACHE = "DELETE FROM user";
 
+        public static readonly string FLUSH_EVENT_CACHE = "DELETE FROM events";
+
         public static readonly string GET_CACHED_USER = "Select * from user where email = @email LIMIT 1";
 
         public static readonly string UPDATE_EVENT_SQLITE = "UPDATE events SET name=@name,begintime=@begintime,endtime=@endtime,location=@location,description=@description,user=@user,timelastedit=@timelastedit,deleteEvent=@delete where uid=@id";

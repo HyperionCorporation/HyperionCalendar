@@ -246,7 +246,7 @@ namespace Calendar
             {
                 foreach (Event myEvent in eventList)
                 {
-                    if (events.Key != myEvent.Key && events.rect.Contains(myEvent.rect))
+                    if (events.Key != myEvent.Key && events.rect.IntersectsWith(myEvent.rect))
                     {
                         events.OverLapped = true;
                         myEvent.OverLapped = true;

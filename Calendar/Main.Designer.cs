@@ -67,12 +67,12 @@
             this.panel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel1.Location = new System.Drawing.Point(12, 27);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(905, 40);
+            this.panel1.Size = new System.Drawing.Size(970, 40);
             this.panel1.TabIndex = 1;
             // 
             // btnPrevMonth
             // 
-            this.btnPrevMonth.Location = new System.Drawing.Point(292, 0);
+            this.btnPrevMonth.Location = new System.Drawing.Point(339, 0);
             this.btnPrevMonth.Name = "btnPrevMonth";
             this.btnPrevMonth.Size = new System.Drawing.Size(75, 40);
             this.btnPrevMonth.TabIndex = 2;
@@ -83,7 +83,7 @@
             // 
             // btnNextMonth
             // 
-            this.btnNextMonth.Location = new System.Drawing.Point(553, 0);
+            this.btnNextMonth.Location = new System.Drawing.Point(616, -3);
             this.btnNextMonth.Name = "btnNextMonth";
             this.btnNextMonth.Size = new System.Drawing.Size(75, 40);
             this.btnNextMonth.TabIndex = 1;
@@ -93,13 +93,13 @@
             // 
             // lblMonthYear
             // 
-            this.lblMonthYear.AutoSize = true;
             this.lblMonthYear.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMonthYear.Location = new System.Drawing.Point(373, 0);
+            this.lblMonthYear.Location = new System.Drawing.Point(420, 0);
             this.lblMonthYear.Name = "lblMonthYear";
-            this.lblMonthYear.Size = new System.Drawing.Size(138, 29);
+            this.lblMonthYear.Size = new System.Drawing.Size(190, 29);
             this.lblMonthYear.TabIndex = 0;
             this.lblMonthYear.Text = "Month-Year";
+            this.lblMonthYear.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // menuStrip1
             // 
@@ -125,7 +125,7 @@
             // syncToolStripMenuItem
             // 
             this.syncToolStripMenuItem.Name = "syncToolStripMenuItem";
-            this.syncToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.syncToolStripMenuItem.Size = new System.Drawing.Size(99, 22);
             this.syncToolStripMenuItem.Text = "Sync";
             this.syncToolStripMenuItem.Click += new System.EventHandler(this.SyncButtonPressed);
             // 
@@ -175,7 +175,6 @@
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

@@ -16,10 +16,12 @@ namespace Calendar
     public partial class AddUser : Form
     {
         private Persistence persistence;
+        public static BackgroundWorker bw;
         
         public AddUser(Persistence persistence)
         {
             InitializeComponent();
+            bw = new BackgroundWorker();
             this.persistence = persistence;
         }
 
@@ -35,33 +37,71 @@ namespace Calendar
             else if (txtName.Text != String.Empty && txtPassword.Text != String.Empty)
             {
                 Dictionary<String, String> HashedCredentials = User.hashPassword(txtPassword.Text);
-                this.Tag = new User(txtName.Text, txtEmail.Text, HashedCredentials["hashedpassword"], HashedCredentials["salt"]);
+                this.Tag = new User(txtName.Text, txtEmail.Text, HashedCredentials["hashedpassword"],true, HashedCredentials["salt"]);
                 this.DialogResult = DialogResult.OK;
+            }
+        }
+
+
+        /// <summary>
+        /// Handles the RunWorkerCompleted event of the bw control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RunWorkerCompletedEventArgs"/> instance containing the event data.</param>
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Tuple<string, bool, bool> resultSet = (Tuple<string, bool, bool>)e.Result;
+            lblEmailWarn.Text = resultSet.Item1;
+            lblEmailWarn.Visible = resultSet.Item2;
+            btnSubmit.Enabled = resultSet.Item3;
+        }
+
+        /// <summary>
+        /// Handles the ProgressChanged event of the bw control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ProgressChangedEventArgs"/> instance containing the event data.</param>
+        static void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+        }
+
+        private void CheckExists(object sender, DoWorkEventArgs e)
+        {
+
+            if (persistence.UserExists(txtEmail.Text.ToString()) != StorageLocation.NULL)
+            {
+                e.Result = Tuple.Create<string, bool, bool>("Name Already Exists", true, false);
+                //lblEmailWarn.Text = "Name Already Exists";
+                //lblEmailWarn.Visible = true;
+                //btnSubmit.Enabled = false;
+            }
+
+            else if (!isValidEmail(txtEmail.Text.ToString()))
+            {
+                e.Result = Tuple.Create<string, bool, bool>("Invalid Email", true, false);
+                //lblEmailWarn.Text = "Invalid Email";
+                //lblEmailWarn.Visible = true;
+                //btnSubmit.Enabled = false;
+            }
+
+            else
+            {
+                e.Result = Tuple.Create<string, bool, bool>("", false, true);
+                //lblEmailWarn.Visible = false;
+                //btnSubmit.Enabled = true;
             }
         }
 
         //When you leave the txtEmail Box
         private void txtEmail_Leave(object sender, EventArgs e)
         {
-            if (persistence.UserExists(txtEmail.Text.ToString()) != StorageLocation.NULL)
-            {
-                lblEmailWarn.Text = "Name Already Exists";
-                lblEmailWarn.Visible = true;
-                btnSubmit.Enabled = false;
-            }
 
-            else if (!isValidEmail(txtEmail.Text.ToString()))
-            {
-                lblEmailWarn.Text = "Invalid Email";
-                lblEmailWarn.Visible = true;
-                btnSubmit.Enabled = false;
-            }
-
-            else
-            {
-                lblEmailWarn.Visible = false;
-                btnSubmit.Enabled = true;
-            }
+            bw.DoWork += CheckExists;
+            bw.WorkerReportsProgress = true;
+            bw.ProgressChanged += bw_ProgressChanged;
+            bw.WorkerSupportsCancellation = true;
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            bw.RunWorkerAsync();
         }
 
         //Validate the email address
@@ -99,6 +139,11 @@ namespace Calendar
             
         }
 
+        /// <summary>
+        /// Handles the TextChanged event of the txtPasswordVerify control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void txtPasswordVerify_TextChanged(object sender, EventArgs e)
         {
             //Check for matching passwords
