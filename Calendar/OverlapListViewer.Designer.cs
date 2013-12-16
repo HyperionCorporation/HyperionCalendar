@@ -28,13 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.listView1 = new System.Windows.Forms.ListView();
             this.SuspendLayout();
+            // 
+            // listView1
+            // 
+            this.listView1.Location = new System.Drawing.Point(5, 5);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(496, 166);
+            this.listView1.TabIndex = 0;
+            this.listView1.UseCompatibleStateImageBehavior = false;
             // 
             // OverlapListViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(506, 262);
+            this.Controls.Add(this.listView1);
             this.Name = "OverlapListViewer";
             this.Text = "OverlapListViewer";
             this.ResumeLayout(false);
@@ -42,5 +52,7 @@
         }
 
         #endregion
+
+        private System.Windows.Forms.ListView listView1;
     }
 }

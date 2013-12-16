@@ -58,9 +58,9 @@
             this.lblLogin.AutoSize = true;
             this.lblLogin.Location = new System.Drawing.Point(13, 13);
             this.lblLogin.Name = "lblLogin";
-            this.lblLogin.Size = new System.Drawing.Size(33, 13);
+            this.lblLogin.Size = new System.Drawing.Size(32, 13);
             this.lblLogin.TabIndex = 2;
-            this.lblLogin.Text = "Login";
+            this.lblLogin.Text = "Email";
             // 
             // lblPassword
             // 
@@ -97,7 +97,7 @@
             this.btnSignup.Name = "btnSignup";
             this.btnSignup.Size = new System.Drawing.Size(75, 23);
             this.btnSignup.TabIndex = 6;
-            this.btnSignup.Text = "Signup";
+            this.btnSignup.Text = "Sign up";
             this.btnSignup.UseVisualStyleBackColor = true;
             this.btnSignup.Click += new System.EventHandler(this.btnSignup_Click);
             // 
