@@ -22,9 +22,11 @@ namespace Calendar
         private string hashedPasswd; //DO NOT STORE PLAIN TEXT PASSWORD!
         private string salt;
         private int? uid;
+        private bool isCached;
 
         public User()
         {
+            this.isCached = false;
         }
 
         /// <summary>
@@ -34,13 +36,14 @@ namespace Calendar
         /// <param name="email">The email of the user.</param>
         /// <param name="hashedPasswd">The hashed password.</param>
         /// <param name="salt">The salt associated with the user</param>
-        public User(string name, string email, string hashedPasswd, string salt = null, int? uid = null)
+        public User(string name, string email, string hashedPasswd,bool isCached,string salt = null,int? uid = null)
         {
             this.name = name;
             this.email = email.ToLower();
             this.hashedPasswd = hashedPasswd;
             this.salt = salt;
             this.uid = uid;
+            this.isCached = isCached;
          }
 
 

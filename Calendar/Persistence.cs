@@ -20,7 +20,8 @@ namespace Calendar
         {
             SQLITE,
             MYSQL,
-            NULL
+            NULL,
+            ERRCONN
         }
 
         public Persistence()
@@ -81,10 +82,17 @@ namespace Calendar
 
             if (userCached == null)
             {
-                User user = mysqlPersitance.GetUser(email).Item2;
+                Tuple<bool,User> returnedItems = mysqlPersitance.GetUser(email);
+                User user = returnedItems.Item2;
+                bool didConnect = returnedItems.Item1;
 
                 if (user != null)
                     return Location.MYSQL;
+                else if (didConnect == false)
+                {
+                    return Location.ERRCONN;
+                }
+
                 else
                 {
                     return Location.NULL;
@@ -351,7 +359,7 @@ namespace Calendar
                 string hashedPassword = (string)reader["password"];
                 string salt = (string)reader["salt"];
                 int key = Convert.ToInt32((long)reader["id"]);
-                return new User(name, DBEmail, hashedPassword, salt, key);
+                return new User(name, DBEmail, hashedPassword,true, salt, key);
             }
             catch (InvalidCastException)
             {
@@ -699,7 +707,7 @@ namespace Calendar
                         String salt = (string)dataReader["salt"];
                         int uid = (int)dataReader["uid"];
                         //Read in last changed. 
-                        returnUser = new User(name, email, hashedPassword, salt, uid);
+                        returnUser = new User(name, email, hashedPassword,false, salt, uid);
                     }
                     
                     //return list to be displayed

@@ -79,13 +79,16 @@ namespace Calendar
         {
             bw.ReportProgress(25);
             string email = SignIn.signIn.txtUserLogin.Text;
-            Tuple<bool,User> result = SignIn.persistence.GetUser(email);
-            bool didConnect = result.Item1;
-            SignIn.user = result.Item2;
-            if (didConnect)
+            StorageLocation loc = persistence.UserExists(SignIn.signIn.txtUserLogin.Text.ToLower());
+            if (loc != StorageLocation.ERRCONN)
             {
                 bw.ReportProgress(50);
-                StorageLocation loc = persistence.UserExists(SignIn.signIn.txtUserLogin.Text.ToLower());
+                if (loc != StorageLocation.SQLITE)
+                {
+                    Tuple<bool, User> result = SignIn.persistence.GetUser(email);
+                    user = result.Item2;
+                }
+
                 bw.ReportProgress(75);
                 if (loc != StorageLocation.NULL)
                 {
@@ -105,6 +108,11 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Handles the RunWorkerCompleted event of the bw control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RunWorkerCompletedEventArgs"/> instance containing the event data.</param>
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             btnLogin.Enabled = true;
@@ -115,7 +123,7 @@ namespace Calendar
         /// Handles the ProgressChanged event of the bw control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="ProgressChangedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="ProgressChangedEventArgs" /> instance containing the event data.</param>
         static void bw_ProgressChanged(object sender,ProgressChangedEventArgs e)
         {
             SignIn.signIn.prgsLogin.Value = e.ProgressPercentage;
@@ -135,6 +143,10 @@ namespace Calendar
                 {
                     MessageBox.Show("Login Succesful", "Login");
                     return true;
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect Username/Password", "Login Error");
                 }
             }
 
@@ -158,7 +170,7 @@ namespace Calendar
                 {
                     MessageBox.Show("Incorrect Username/Password", "Login Error");
                 }
-                return false; //We need to wait for the thread to call a method
+                return false;
 
             }
 
