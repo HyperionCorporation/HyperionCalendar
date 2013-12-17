@@ -28,10 +28,10 @@ namespace Calendar
             InitializeComponent();
             //Get persistence
             persistence = new Persistence();
-            
 
+            sync = new Sync(persistence, null, this);
             //Get user login
-            Form signIn = new SignIn(persistence,this);
+            Form signIn = new SignIn(persistence,this,sync);
             DialogResult signInResult = signIn.ShowDialog();
             if (signInResult == DialogResult.OK)
             {
@@ -41,7 +41,7 @@ namespace Calendar
                 //Calendar starts on todays date
                 lblMonthYear.Text = getDateString(DateTime.Now);
                 user = (User)signIn.Tag;
-                currentCalendar = new Calendar(DateTime.Now, this, persistence, user);
+                currentCalendar = new Calendar(DateTime.Now, this, persistence, user, dataGridView1);
                 currentCalendar.buildDataSet(dataGridView1);
                 this.Text = "Calendar";
                 //this.Width = 933;
@@ -54,7 +54,7 @@ namespace Calendar
 
             AutoResetEvent autoEvent = new AutoResetEvent(false);
             sync = new Sync(persistence, user,this);
-            timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 1000, 120000);
+            timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 120000, 120000);
             syncThread = new Thread(new ThreadStart(sync.startSync));
             syncThread.Name = "SyncThread";
 
@@ -63,7 +63,7 @@ namespace Calendar
 
             SetCellBackground();
             SetSelectionColor();
-
+            refreshSize();
         }
 
         public void SetCellBackground()
@@ -161,12 +161,12 @@ namespace Calendar
                            currentDate.Year == DateTime.Now.Year)
             {
                 //Put the actual date through, that way correct date is highlighted
-                currentCalendar = new Calendar(currentDate, this, persistence, user);
+                currentCalendar = new Calendar(currentDate, this, persistence, user, dataGridView1);
             }
 
             else
             {
-                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user);
+                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user, dataGridView1);
             }
 
             dataGridView1.Rows.Clear();
@@ -192,12 +192,12 @@ namespace Calendar
                 currentDate.Year == DateTime.Now.Year)
             {
                 //Put the actual date through, that way correct date is highlighted
-                currentCalendar = new Calendar(currentDate, this, persistence, user);
+                currentCalendar = new Calendar(currentDate, this, persistence, user, dataGridView1);
             }
 
             else
             {
-                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user);
+                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user, dataGridView1);
             }
 
             dataGridView1.Rows.Clear();
@@ -217,27 +217,14 @@ namespace Calendar
                 Application.Exit();
             else
                 currentCalendar.selectCurrentDate(dataGridView1);
+
+            refreshSize();
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            dataGridView1.Height = this.Height - (this.Height / 15);
-            dataGridView1.Width = this.Width + 10;
-<<<<<<< HEAD
-            currentCalendar.refreshSize(dataGridView1);
-            refreshAllCells(false);
-=======
-            if (currentCalendar != null)
-            {
-                currentCalendar.refreshSize(dataGridView1);
-            }
-            refreshAllCells();
->>>>>>> b18699c6bdf3e82b8b6fe8091015195392f31821
-            panel1.Width = this.Width;
-            btnPrevMonth.Location = new Point((panel1.Width / 3), btnPrevMonth.Location.Y);
-            btnNextMonth.Location = new Point((panel1.Width / 3) * 2, btnNextMonth.Location.Y);
-            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), lblMonthYear.Location.Y);
-            
+            refreshSize();
+           
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -250,7 +237,7 @@ namespace Calendar
                 //update the colors
                 SetCellBackground();
                 SetSelectionColor();
-                currentCalendar.UpdateCurrentDayColor(dataGridView1);//Updates the color for the current day
+                currentCalendar.UpdateColors(dataGridView1);//Updates the color for the current day
                 refreshAllCells(false);
                 Settings.WriteSettings();
             }
@@ -259,10 +246,113 @@ namespace Calendar
         private void SyncButtonPressed(object sender, EventArgs e)
         {
             //Do a manual Sync
-            if (!sync.IsSyncing)
+            if (!sync.IsSyncing && !DataGridViewCalendarCell.isReadingEventList)
             {
                 Thread ManualSyncThread = new Thread(new ThreadStart(sync.DoSync));
                 ManualSyncThread.Start();           
+            }
+        }
+
+        private void btnPrevMonth_Resize(object sender, EventArgs e)
+        {
+            using (var gr = btnPrevMonth.CreateGraphics())
+            {
+                Font font = btnPrevMonth.Font;
+                for (int size = (int)(btnPrevMonth.Height * 72 / gr.DpiY); size >= 8; --size)
+                {
+                    font = new Font(btnPrevMonth.Font.FontFamily, size, btnPrevMonth.Font.Style);
+
+                    if (TextRenderer.MeasureText(btnPrevMonth.Text, font).Width + (TextRenderer.MeasureText(btnPrevMonth.Text, font).Width/2) <= btnPrevMonth.Width) 
+                        break;
+                }
+                btnPrevMonth.Font = font;
+            }
+        }
+
+<<<<<<< HEAD
+        private void HelpMenu_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if(item.Text == "About")
+            {
+                Form aboutMenu = new GenericHelpMenu("About", GenericHelpMenu.GenericHelpMenuType.ABOUT);
+                aboutMenu.Show();
+            }
+            else if(item.Text == "Help")
+            {
+                Form helpMenu = new GenericHelpMenu("Help",GenericHelpMenu.GenericHelpMenuType.HELP);
+                helpMenu.Show();
+=======
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            refreshSize();
+        }
+        private void refreshSize()
+        {
+
+            if (currentCalendar != null)
+            {
+                currentCalendar.refreshSize(dataGridView1);
+            }
+
+            currentCalendar.refreshPosition(dataGridView1);
+
+            refreshAllCells(false);
+
+            dataGridView1.Height = this.Height - ((this.Height * 4) / 20);
+            dataGridView1.Width = this.Width;
+            dataGridView1.Location = new Point(0, (this.Height * 4) / 20);
+
+            panel1.Width = this.Width;
+            panel1.Height = (this.Height * 2) / 20;
+            panel1.Location = new Point(0, (this.Height) / 20);
+
+            btnPrevMonth.Location = new Point((panel1.Width / 3), panel1.Location.Y / 3);
+            btnPrevMonth.Height = (panel1.Height * 8) / 10;
+            btnPrevMonth.Width = (this.Width * 2) / 20;
+
+            btnNextMonth.Location = new Point(((panel1.Width / 3) * 2), panel1.Location.Y / 3);
+            btnNextMonth.Height = (panel1.Height * 8) / 10;
+            btnNextMonth.Width = (this.Width * 2) / 20;
+
+            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), panel1.Location.Y / 3);
+            lblMonthYear.Height = (panel1.Height * 8) / 10;
+            lblMonthYear.Width = (this.Width * 6) / 20;
+
+            menuStrip1.Location = new Point(0, 0);
+
+        }
+
+        private void lblMonthYear_Resize(object sender, EventArgs e)
+        {
+            using (var gr = lblMonthYear.CreateGraphics())
+            {
+                Font font = lblMonthYear.Font;
+                for (int size = (int)(lblMonthYear.Height * 72 / gr.DpiY); size >= 8; --size)
+                {
+                    font = new Font(lblMonthYear.Font.FontFamily, size, lblMonthYear.Font.Style);
+
+                    if (TextRenderer.MeasureText(lblMonthYear.Text, font).Width + (TextRenderer.MeasureText(lblMonthYear.Text, font).Width / 2) <= lblMonthYear.Width)
+                        break;
+                }
+                lblMonthYear.Font = font;
+            }
+        }
+
+        private void btnNextMonth_Resize(object sender, EventArgs e)
+        {
+            using (var gr = btnNextMonth.CreateGraphics())
+            {
+                Font font = btnNextMonth.Font;
+                for (int size = (int)(btnNextMonth.Height * 72 / gr.DpiY); size >= 8; --size)
+                {
+                    font = new Font(btnNextMonth.Font.FontFamily, size, btnNextMonth.Font.Style);
+
+                    if (TextRenderer.MeasureText(btnNextMonth.Text, font).Width + (TextRenderer.MeasureText(btnNextMonth.Text, font).Width / 2) <= btnNextMonth.Width)
+                        break;
+                }
+                btnNextMonth.Font = font;
+>>>>>>> 5cd019d199454ba86ebf6073ce52b680fa1524f5
             }
         }
 
@@ -272,7 +362,7 @@ namespace Calendar
     {
         private bool doSync;
         private bool running;
-        private bool blockSync;
+        public static bool blockSync;
         private Persistence persistence;
         private User user;
         private MainForm main;
@@ -285,6 +375,12 @@ namespace Calendar
             this.persistence = persistence;
             this.user = user;
             this.main = main;
+        }
+
+        public User User
+        {
+            get { return user; }
+            set { user = value; }
         }
 
         public bool IsSyncing
@@ -313,7 +409,7 @@ namespace Calendar
         /// </summary>
         public void DoSync()
         {
-            if (!doSync)
+            if (!doSync && !DataGridViewCalendarCell.isReadingEventList)
             {
                 blockSync = true;
                 //Make sure that there is no current sync event going on
