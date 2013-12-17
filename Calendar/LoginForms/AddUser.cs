@@ -125,6 +125,9 @@ namespace Calendar
             if (atSymbolCount != 1)
                 return false;
 
+            if(email.Contains(' '))
+                return false;
+
             int atSignLocation = email.IndexOf('@');
 
 

@@ -21,7 +21,7 @@ namespace Calendar
         public static User user;
         public static BackgroundWorker bw;
         public static MainForm mainForm;
-        public Sync sync;
+        public static Sync sync;
 
         public SignIn(Persistence persistence,MainForm mainForm,Sync sync)
         {
@@ -31,7 +31,7 @@ namespace Calendar
             this.CenterToScreen();
             SignIn.mainForm = mainForm;
             bw = new BackgroundWorker();
-            this.sync = sync;
+            SignIn.sync = sync;
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -96,6 +96,8 @@ namespace Calendar
                 {
                     if (SignIn.signIn.validateLogin(loc))
                     {
+                        sync.User = SignIn.user;
+                        sync.DoSync();
                         bw.ReportProgress(100);
                         SignIn.signIn.DialogResult = DialogResult.OK;
                         SignIn.signIn.Tag = user;

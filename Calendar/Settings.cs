@@ -266,6 +266,6 @@ namespace Calendar
         public static readonly string SYNC_REMOTE_WITH_LOCAL = "Update events set name=@name,begintime=@begintime,endtime=@endtime,location=@location,description=@description,timelastedit=@timelastedit,deleteEvent=@delete where uid=@uid";
         
         public static readonly string GET_LAST_MODIFIED_TIME_MYSQL = "SELECT timelastedit FROM events WHERE uid=@uid AND user=@userID";
-    
+ 
     }
 }
