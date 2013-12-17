@@ -361,6 +361,7 @@ namespace Calendar
         {
             return calendarView.Width + " " + calendarView.Height;
         }
+
         public void refreshSize(DataGridView calendarView)
         {
             for (int i = 0; i < calendarView.Rows.Count; i++)

@@ -210,7 +210,10 @@ namespace Calendar
         {
             dataGridView1.Height = this.Height - (this.Height / 15);
             dataGridView1.Width = this.Width + 10;
-            currentCalendar.refreshSize(dataGridView1);
+            if (currentCalendar != null)
+            {
+                currentCalendar.refreshSize(dataGridView1);
+            }
             refreshAllCells();
             panel1.Width = this.Width;
             btnPrevMonth.Location = new Point((panel1.Width / 3), btnPrevMonth.Location.Y);

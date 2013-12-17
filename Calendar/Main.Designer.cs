@@ -83,7 +83,7 @@
             // 
             // btnNextMonth
             // 
-            this.btnNextMonth.Location = new System.Drawing.Point(616, -3);
+            this.btnNextMonth.Location = new System.Drawing.Point(616, 0);
             this.btnNextMonth.Name = "btnNextMonth";
             this.btnNextMonth.Size = new System.Drawing.Size(75, 40);
             this.btnNextMonth.TabIndex = 1;

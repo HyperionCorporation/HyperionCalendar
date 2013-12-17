@@ -32,6 +32,10 @@ namespace Calendar
             this.persistence = persistence;
             this.user = user;
             this.hasOverlapped = false;
+            foreach (DataGridViewColumn column in DataGridView.Columns)
+            {
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
             LoadEvents();
         }
 
@@ -86,7 +90,6 @@ namespace Calendar
             this.ContextMenuStrip = new ContextMenuStrip();
             LoadEvents();
             List<ToolStripItem> tsItems = new List<ToolStripItem>();
-            MessageBox.Show("Overlap? " + hasOverlapped);
             foreach (KeyValuePair<long, Event> myEvent in events)
             {
                 ToolStripItem myTSItem = new ToolStripMenuItem();
@@ -141,7 +144,7 @@ namespace Calendar
         {
             base.OnDoubleClick(e);
             Rectangle rect = new Rectangle();
-
+            checkBoxOverlap();
            
             cursorPosition = this.DataGridView.PointToClient(Cursor.Position);
             //addRectangle(rect);
@@ -163,7 +166,17 @@ namespace Calendar
                      }
                 }
             }
-            else
+            else if (exisitingEvent.OverLapped == true)
+            {
+                List<Event> eventList = GetEventsFromCell();
+                Form modifyOverlap = new OverlapListViewer(eventList);
+                DialogResult modifyOverlapResult = modifyOverlap.ShowDialog();
+                if ((Event)modifyOverlap.Tag != null)
+                {
+                    updateEvent((Event)modifyOverlap.Tag);
+                }
+            }
+            else if (exisitingEvent.OverLapped == false)
             {
                 updateEvent(exisitingEvent);
             }
@@ -252,10 +265,9 @@ namespace Calendar
                     }
 
 
-                    else if (events.Key != myEvent.Key)
+                    else if (events.Key != myEvent.Key && events.OverLapped == false)
                     {
                         events.OverLapped = false;
-                        myEvent.OverLapped = false;
                         this.hasOverlapped = false;
                     }
                 }
