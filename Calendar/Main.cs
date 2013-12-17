@@ -255,7 +255,7 @@ namespace Calendar
         private void SyncButtonPressed(object sender, EventArgs e)
         {
             //Do a manual Sync
-            if (!sync.IsSyncing)
+            if (!sync.IsSyncing && !DataGridViewCalendarCell.isReadingEventList)
             {
                 Thread ManualSyncThread = new Thread(new ThreadStart(sync.DoSync));
                 ManualSyncThread.Start();           
@@ -268,7 +268,7 @@ namespace Calendar
     {
         private bool doSync;
         private bool running;
-        private bool blockSync;
+        public static bool blockSync;
         private Persistence persistence;
         private User user;
         private MainForm main;
@@ -315,7 +315,7 @@ namespace Calendar
         /// </summary>
         public void DoSync()
         {
-            if (!doSync)
+            if (!doSync && !DataGridViewCalendarCell.isReadingEventList)
             {
                 blockSync = true;
                 //Make sure that there is no current sync event going on

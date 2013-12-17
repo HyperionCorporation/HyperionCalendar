@@ -64,7 +64,7 @@ namespace Calendar
                                 break;
                             case "CellBackground":
                                 //returnedValues = GetRGB(reader.ReadString());
-                                cellBackground = Color.FromArgb(-1);
+                                cellBackground = Color.FromArgb(Convert.ToInt32(reader.ReadString()));
                                 break;
                             case "CellHighlight":
                                 //returnedValues = GetRGB(reader.ReadString());

@@ -724,7 +724,6 @@ namespace Calendar
         public Tuple<bool,User> GetUser(string userEmail)
         {
             string query = PermanentSettings.GET_USER_MYSQL;
-            
 
             //Open connection
             if (this.OpenConnection(connection) == true)
