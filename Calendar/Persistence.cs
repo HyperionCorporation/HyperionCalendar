@@ -828,23 +828,22 @@ namespace Calendar
 
 
             int index = 0;
-            foreach (Event myEvent in eventList)
+            foreach (Event localEvent in eventList)
             {
                 if (this.OpenConnection(connection) == true)
                 {
-                    if (lastModifiedTimes[index].Item1 && myEvent.LastModified > lastModifiedTimes[index].Item2)
+                    if (lastModifiedTimes[index].Item1 && localEvent.LastModified > lastModifiedTimes[index].Item2)
                     {
-                        //Event Exists in DB and is older than the local DB. Update the remote
-
+                        //Event exists in DB and local event is newer than the remote. Update the remote. 
                         MySqlCommand cmd = new MySqlCommand(querySync, connection);
-                        cmd.Parameters.AddWithValue("@name", myEvent.name);
-                        cmd.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
-                        cmd.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
-                        cmd.Parameters.AddWithValue("@location", myEvent.location);
-                        cmd.Parameters.AddWithValue("@description", myEvent.description);
-                        cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
-                        cmd.Parameters.AddWithValue("@uid", myEvent.Key);
-                        cmd.Parameters.AddWithValue("@delete", myEvent.DeleteEvent);
+                        cmd.Parameters.AddWithValue("@name", localEvent.name);
+                        cmd.Parameters.AddWithValue("@begintime", localEvent.begin.Ticks);
+                        cmd.Parameters.AddWithValue("@endtime", localEvent.end.Ticks);
+                        cmd.Parameters.AddWithValue("@location", localEvent.location);
+                        cmd.Parameters.AddWithValue("@description", localEvent.description);
+                        cmd.Parameters.AddWithValue("@timelastedit", localEvent.LastModified.Ticks);
+                        cmd.Parameters.AddWithValue("@uid", localEvent.Key);
+                        cmd.Parameters.AddWithValue("@delete", localEvent.DeleteEvent);
                         
                         //Execute command
                         try
@@ -863,25 +862,70 @@ namespace Calendar
                             this.CloseConnection();
                         }
                     }
-                    else if (myEvent.DeleteEvent)
+
+                    else if (lastModifiedTimes[index].Item1 && localEvent.LastModified < lastModifiedTimes[index].Item2)
+                    {
+                        //Event exists in DB and remote event is newer than the local. Update the local.
+                        MySqlCommand cmd = new MySqlCommand(PermanentSettings.GET_EVENTS_MYSQL, connection);
+                        cmd.Parameters.AddWithValue("@user", user.UID);
+                        MySqlDataReader dataReader = null;
+                        Dictionary<long,Event> localEventList = new Dictionary<long,Event>();
+                        //Execute command
+                        try
+                        {
+                            dataReader = cmd.ExecuteReader();
+                            //Read the data and store them in the list
+                            while (dataReader.Read())
+                            {
+                                string name = Convert.ToString(dataReader["name"]);
+                                long beginTime = Convert.ToInt64(dataReader["begintime"]);
+                                long endtime = Convert.ToInt64(dataReader["endtime"]);
+                                string location = Convert.ToString(dataReader["location"]);
+                                string description = Convert.ToString(dataReader["description"]);
+                                int userID = Convert.ToInt32(dataReader["user"]);
+                                long timelastedit = Convert.ToInt64(dataReader["timelastedit"]);
+                                long uniqueID = Convert.ToInt64(dataReader["uid"]);
+                                bool delete = Convert.ToBoolean(dataReader["deleteEvent"]);
+                                localEventList.Add(uniqueID,new Event(name, new DateTime(beginTime), new DateTime(endtime), location, description, uniqueID, new DateTime(timelastedit), delete));
+                            }
+
+                            //Update only the event that needs to be updated
+                            Event updateEvent = localEventList[localEvent.Key];
+                            sqLitePersist.EditEvent(updateEvent, user); //Save the more up to date event
+                            
+
+                        }
+
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Error Persistence.DoSync " + e.Message);
+                        }
+
+                        finally
+                        {
+                            this.CloseConnection();
+                        }
+                    }
+
+                    else if (localEvent.DeleteEvent)
                     {
                         //Event is marked for deletion.
-                        sqLitePersist.DeleteEvent(myEvent);
-                        DeleteEvent(myEvent,connection);
+                        sqLitePersist.DeleteEvent(localEvent);
+                        DeleteEvent(localEvent, connection);
                     }
                     else if (!lastModifiedTimes[index].Item1)
                     {
                         //Event doesn't exist at remote DB
                         MySqlCommand cmd = new MySqlCommand(queryInsert, connection);
-                        cmd.Parameters.AddWithValue("@name", myEvent.name);
-                        cmd.Parameters.AddWithValue("@begintime", myEvent.begin.Ticks);
-                        cmd.Parameters.AddWithValue("@endtime", myEvent.end.Ticks);
-                        cmd.Parameters.AddWithValue("@location", myEvent.location);
-                        cmd.Parameters.AddWithValue("@description", myEvent.description);
+                        cmd.Parameters.AddWithValue("@name", localEvent.name);
+                        cmd.Parameters.AddWithValue("@begintime", localEvent.begin.Ticks);
+                        cmd.Parameters.AddWithValue("@endtime", localEvent.end.Ticks);
+                        cmd.Parameters.AddWithValue("@location", localEvent.location);
+                        cmd.Parameters.AddWithValue("@description", localEvent.description);
                         cmd.Parameters.AddWithValue("@userid", user.UID);
-                        cmd.Parameters.AddWithValue("@timelastedit", myEvent.LastModified.Ticks);
-                        cmd.Parameters.AddWithValue("@uid", myEvent.Key);
-                        cmd.Parameters.AddWithValue("@delete", myEvent.DeleteEvent);
+                        cmd.Parameters.AddWithValue("@timelastedit", localEvent.LastModified.Ticks);
+                        cmd.Parameters.AddWithValue("@uid", localEvent.Key);
+                        cmd.Parameters.AddWithValue("@delete", localEvent.DeleteEvent);
 
                         //Execute command
                         try
@@ -962,7 +1006,7 @@ namespace Calendar
                 if (user.IsCached)
                 {
                     //Delete Events in the database. This destroys any other users unsaved events. 
-                    sqLitePersist.DeleteEventCache();
+                    //sqLitePersist.DeleteEventCache();
                 }
                 //@eventID WHERE user.uid = @userid
                 cmd.Parameters.AddWithValue("@user", user.UID);
@@ -1050,9 +1094,9 @@ namespace Calendar
                 {
                     localDBConnection.Close();
                 }
-
-                main.refreshAllCells(true); //Cells were probably modified, so refresh them all.
             }
+
+            main.refreshAllCells(true); //Cells were probably modified, so refresh them all.
         }
     }
 }
