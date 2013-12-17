@@ -38,22 +38,24 @@
             this.lblColorHighlight = new System.Windows.Forms.Label();
             this.lblOtherMonth = new System.Windows.Forms.Label();
             this.lblCurrentDayColor = new System.Windows.Forms.Label();
-            this.cmboCellBGR = new System.Windows.Forms.ComboBox();
-            this.cmboCellBGG = new System.Windows.Forms.ComboBox();
-            this.cmboCellBGB = new System.Windows.Forms.ComboBox();
-            this.cmboCellHighlightR = new System.Windows.Forms.ComboBox();
-            this.cmboCellHighlightG = new System.Windows.Forms.ComboBox();
-            this.cmboCellHighlightB = new System.Windows.Forms.ComboBox();
-            this.cmboCellOtherB = new System.Windows.Forms.ComboBox();
-            this.cmboCellOtherG = new System.Windows.Forms.ComboBox();
-            this.cmboCellOtherR = new System.Windows.Forms.ComboBox();
-            this.cmboCellDayB = new System.Windows.Forms.ComboBox();
-            this.cmboCellDayG = new System.Windows.Forms.ComboBox();
-            this.cmboCellDayR = new System.Windows.Forms.ComboBox();
             this.pnlCellBGPreview = new System.Windows.Forms.Panel();
             this.pnlCellHighlightPreview = new System.Windows.Forms.Panel();
             this.pnlCellOtherPreview = new System.Windows.Forms.Panel();
             this.pnlCellDayPreview = new System.Windows.Forms.Panel();
+            this.txtBGR = new System.Windows.Forms.TextBox();
+            this.txtBGG = new System.Windows.Forms.TextBox();
+            this.txtBGB = new System.Windows.Forms.TextBox();
+            this.txtCHG = new System.Windows.Forms.TextBox();
+            this.txtCHR = new System.Windows.Forms.TextBox();
+            this.txtCHB = new System.Windows.Forms.TextBox();
+            this.txtOMB = new System.Windows.Forms.TextBox();
+            this.txtOMG = new System.Windows.Forms.TextBox();
+            this.txtOMR = new System.Windows.Forms.TextBox();
+            this.txtCurrentDayB = new System.Windows.Forms.TextBox();
+            this.txtCurrentDayG = new System.Windows.Forms.TextBox();
+            this.txtCurrentDayR = new System.Windows.Forms.TextBox();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -122,7 +124,7 @@
             // lblColorHighlight
             // 
             this.lblColorHighlight.AutoSize = true;
-            this.lblColorHighlight.Location = new System.Drawing.Point(12, 135);
+            this.lblColorHighlight.Location = new System.Drawing.Point(12, 134);
             this.lblColorHighlight.Name = "lblColorHighlight";
             this.lblColorHighlight.Size = new System.Drawing.Size(95, 13);
             this.lblColorHighlight.TabIndex = 11;
@@ -131,7 +133,7 @@
             // lblOtherMonth
             // 
             this.lblOtherMonth.AutoSize = true;
-            this.lblOtherMonth.Location = new System.Drawing.Point(12, 163);
+            this.lblOtherMonth.Location = new System.Drawing.Point(12, 160);
             this.lblOtherMonth.Name = "lblOtherMonth";
             this.lblOtherMonth.Size = new System.Drawing.Size(113, 13);
             this.lblOtherMonth.TabIndex = 12;
@@ -140,157 +142,178 @@
             // lblCurrentDayColor
             // 
             this.lblCurrentDayColor.AutoSize = true;
-            this.lblCurrentDayColor.Location = new System.Drawing.Point(12, 190);
+            this.lblCurrentDayColor.Location = new System.Drawing.Point(12, 186);
             this.lblCurrentDayColor.Name = "lblCurrentDayColor";
             this.lblCurrentDayColor.Size = new System.Drawing.Size(73, 13);
             this.lblCurrentDayColor.TabIndex = 13;
             this.lblCurrentDayColor.Text = "Cell Day Color";
             // 
-            // cmboCellBGR
-            // 
-            this.cmboCellBGR.FormattingEnabled = true;
-            this.cmboCellBGR.Location = new System.Drawing.Point(130, 101);
-            this.cmboCellBGR.Name = "cmboCellBGR";
-            this.cmboCellBGR.Size = new System.Drawing.Size(51, 21);
-            this.cmboCellBGR.TabIndex = 14;
-            // 
-            // cmboCellBGG
-            // 
-            this.cmboCellBGG.FormattingEnabled = true;
-            this.cmboCellBGG.Location = new System.Drawing.Point(187, 101);
-            this.cmboCellBGG.Name = "cmboCellBGG";
-            this.cmboCellBGG.Size = new System.Drawing.Size(46, 21);
-            this.cmboCellBGG.TabIndex = 15;
-            // 
-            // cmboCellBGB
-            // 
-            this.cmboCellBGB.FormattingEnabled = true;
-            this.cmboCellBGB.Location = new System.Drawing.Point(239, 101);
-            this.cmboCellBGB.Name = "cmboCellBGB";
-            this.cmboCellBGB.Size = new System.Drawing.Size(44, 21);
-            this.cmboCellBGB.TabIndex = 16;
-            // 
-            // cmboCellHighlightR
-            // 
-            this.cmboCellHighlightR.FormattingEnabled = true;
-            this.cmboCellHighlightR.Location = new System.Drawing.Point(130, 128);
-            this.cmboCellHighlightR.Name = "cmboCellHighlightR";
-            this.cmboCellHighlightR.Size = new System.Drawing.Size(51, 21);
-            this.cmboCellHighlightR.TabIndex = 17;
-            // 
-            // cmboCellHighlightG
-            // 
-            this.cmboCellHighlightG.FormattingEnabled = true;
-            this.cmboCellHighlightG.Location = new System.Drawing.Point(187, 127);
-            this.cmboCellHighlightG.Name = "cmboCellHighlightG";
-            this.cmboCellHighlightG.Size = new System.Drawing.Size(46, 21);
-            this.cmboCellHighlightG.TabIndex = 18;
-            // 
-            // cmboCellHighlightB
-            // 
-            this.cmboCellHighlightB.FormattingEnabled = true;
-            this.cmboCellHighlightB.Location = new System.Drawing.Point(239, 128);
-            this.cmboCellHighlightB.Name = "cmboCellHighlightB";
-            this.cmboCellHighlightB.Size = new System.Drawing.Size(44, 21);
-            this.cmboCellHighlightB.TabIndex = 19;
-            // 
-            // cmboCellOtherB
-            // 
-            this.cmboCellOtherB.FormattingEnabled = true;
-            this.cmboCellOtherB.Location = new System.Drawing.Point(239, 154);
-            this.cmboCellOtherB.Name = "cmboCellOtherB";
-            this.cmboCellOtherB.Size = new System.Drawing.Size(44, 21);
-            this.cmboCellOtherB.TabIndex = 22;
-            // 
-            // cmboCellOtherG
-            // 
-            this.cmboCellOtherG.FormattingEnabled = true;
-            this.cmboCellOtherG.Location = new System.Drawing.Point(187, 154);
-            this.cmboCellOtherG.Name = "cmboCellOtherG";
-            this.cmboCellOtherG.Size = new System.Drawing.Size(46, 21);
-            this.cmboCellOtherG.TabIndex = 21;
-            // 
-            // cmboCellOtherR
-            // 
-            this.cmboCellOtherR.FormattingEnabled = true;
-            this.cmboCellOtherR.Location = new System.Drawing.Point(131, 155);
-            this.cmboCellOtherR.Name = "cmboCellOtherR";
-            this.cmboCellOtherR.Size = new System.Drawing.Size(50, 21);
-            this.cmboCellOtherR.TabIndex = 20;
-            // 
-            // cmboCellDayB
-            // 
-            this.cmboCellDayB.FormattingEnabled = true;
-            this.cmboCellDayB.Location = new System.Drawing.Point(239, 182);
-            this.cmboCellDayB.Name = "cmboCellDayB";
-            this.cmboCellDayB.Size = new System.Drawing.Size(44, 21);
-            this.cmboCellDayB.TabIndex = 25;
-            // 
-            // cmboCellDayG
-            // 
-            this.cmboCellDayG.FormattingEnabled = true;
-            this.cmboCellDayG.Location = new System.Drawing.Point(187, 181);
-            this.cmboCellDayG.Name = "cmboCellDayG";
-            this.cmboCellDayG.Size = new System.Drawing.Size(46, 21);
-            this.cmboCellDayG.TabIndex = 24;
-            // 
-            // cmboCellDayR
-            // 
-            this.cmboCellDayR.FormattingEnabled = true;
-            this.cmboCellDayR.Location = new System.Drawing.Point(131, 182);
-            this.cmboCellDayR.Name = "cmboCellDayR";
-            this.cmboCellDayR.Size = new System.Drawing.Size(50, 21);
-            this.cmboCellDayR.TabIndex = 23;
-            // 
             // pnlCellBGPreview
             // 
-            this.pnlCellBGPreview.Location = new System.Drawing.Point(289, 101);
+            this.pnlCellBGPreview.Location = new System.Drawing.Point(301, 101);
             this.pnlCellBGPreview.Name = "pnlCellBGPreview";
             this.pnlCellBGPreview.Size = new System.Drawing.Size(28, 21);
             this.pnlCellBGPreview.TabIndex = 26;
             // 
             // pnlCellHighlightPreview
             // 
-            this.pnlCellHighlightPreview.Location = new System.Drawing.Point(289, 127);
+            this.pnlCellHighlightPreview.Location = new System.Drawing.Point(301, 126);
             this.pnlCellHighlightPreview.Name = "pnlCellHighlightPreview";
             this.pnlCellHighlightPreview.Size = new System.Drawing.Size(28, 21);
             this.pnlCellHighlightPreview.TabIndex = 27;
             // 
             // pnlCellOtherPreview
             // 
-            this.pnlCellOtherPreview.Location = new System.Drawing.Point(289, 154);
+            this.pnlCellOtherPreview.Location = new System.Drawing.Point(301, 153);
             this.pnlCellOtherPreview.Name = "pnlCellOtherPreview";
             this.pnlCellOtherPreview.Size = new System.Drawing.Size(28, 21);
             this.pnlCellOtherPreview.TabIndex = 27;
             // 
             // pnlCellDayPreview
             // 
-            this.pnlCellDayPreview.Location = new System.Drawing.Point(289, 181);
+            this.pnlCellDayPreview.Location = new System.Drawing.Point(301, 180);
             this.pnlCellDayPreview.Name = "pnlCellDayPreview";
             this.pnlCellDayPreview.Size = new System.Drawing.Size(28, 21);
             this.pnlCellDayPreview.TabIndex = 27;
+            // 
+            // txtBGR
+            // 
+            this.txtBGR.Location = new System.Drawing.Point(130, 101);
+            this.txtBGR.Name = "txtBGR";
+            this.txtBGR.Size = new System.Drawing.Size(51, 20);
+            this.txtBGR.TabIndex = 28;
+            this.txtBGR.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtBGG
+            // 
+            this.txtBGG.Location = new System.Drawing.Point(187, 101);
+            this.txtBGG.Name = "txtBGG";
+            this.txtBGG.Size = new System.Drawing.Size(51, 20);
+            this.txtBGG.TabIndex = 29;
+            this.txtBGG.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtBGB
+            // 
+            this.txtBGB.Location = new System.Drawing.Point(244, 101);
+            this.txtBGB.Name = "txtBGB";
+            this.txtBGB.Size = new System.Drawing.Size(51, 20);
+            this.txtBGB.TabIndex = 30;
+            this.txtBGB.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtCHG
+            // 
+            this.txtCHG.Location = new System.Drawing.Point(187, 127);
+            this.txtCHG.Name = "txtCHG";
+            this.txtCHG.Size = new System.Drawing.Size(51, 20);
+            this.txtCHG.TabIndex = 32;
+            this.txtCHG.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtCHR
+            // 
+            this.txtCHR.Location = new System.Drawing.Point(130, 128);
+            this.txtCHR.Name = "txtCHR";
+            this.txtCHR.Size = new System.Drawing.Size(51, 20);
+            this.txtCHR.TabIndex = 31;
+            this.txtCHR.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtCHB
+            // 
+            this.txtCHB.Location = new System.Drawing.Point(244, 127);
+            this.txtCHB.Name = "txtCHB";
+            this.txtCHB.Size = new System.Drawing.Size(51, 20);
+            this.txtCHB.TabIndex = 33;
+            this.txtCHB.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtOMB
+            // 
+            this.txtOMB.Location = new System.Drawing.Point(244, 153);
+            this.txtOMB.Name = "txtOMB";
+            this.txtOMB.Size = new System.Drawing.Size(51, 20);
+            this.txtOMB.TabIndex = 36;
+            this.txtOMB.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtOMG
+            // 
+            this.txtOMG.Location = new System.Drawing.Point(187, 153);
+            this.txtOMG.Name = "txtOMG";
+            this.txtOMG.Size = new System.Drawing.Size(51, 20);
+            this.txtOMG.TabIndex = 35;
+            this.txtOMG.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtOMR
+            // 
+            this.txtOMR.Location = new System.Drawing.Point(130, 154);
+            this.txtOMR.Name = "txtOMR";
+            this.txtOMR.Size = new System.Drawing.Size(51, 20);
+            this.txtOMR.TabIndex = 34;
+            this.txtOMR.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtCurrentDayB
+            // 
+            this.txtCurrentDayB.Location = new System.Drawing.Point(244, 179);
+            this.txtCurrentDayB.Name = "txtCurrentDayB";
+            this.txtCurrentDayB.Size = new System.Drawing.Size(51, 20);
+            this.txtCurrentDayB.TabIndex = 39;
+            this.txtCurrentDayB.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtCurrentDayG
+            // 
+            this.txtCurrentDayG.Location = new System.Drawing.Point(187, 179);
+            this.txtCurrentDayG.Name = "txtCurrentDayG";
+            this.txtCurrentDayG.Size = new System.Drawing.Size(51, 20);
+            this.txtCurrentDayG.TabIndex = 38;
+            this.txtCurrentDayG.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // txtCurrentDayR
+            // 
+            this.txtCurrentDayR.Location = new System.Drawing.Point(130, 180);
+            this.txtCurrentDayR.Name = "txtCurrentDayR";
+            this.txtCurrentDayR.Size = new System.Drawing.Size(51, 20);
+            this.txtCurrentDayR.TabIndex = 37;
+            this.txtCurrentDayR.TextChanged += new System.EventHandler(this.txt_TextChanged);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Location = new System.Drawing.Point(85, 226);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(75, 23);
+            this.btnSave.TabIndex = 40;
+            this.btnSave.Text = "Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(163, 226);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 41;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
             // 
             // SettingsFormsGeneral
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(329, 261);
+            this.ClientSize = new System.Drawing.Size(336, 261);
+            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.txtCurrentDayB);
+            this.Controls.Add(this.txtCurrentDayG);
+            this.Controls.Add(this.txtCurrentDayR);
+            this.Controls.Add(this.txtOMB);
+            this.Controls.Add(this.txtOMG);
+            this.Controls.Add(this.txtOMR);
+            this.Controls.Add(this.txtCHB);
+            this.Controls.Add(this.txtCHG);
+            this.Controls.Add(this.txtCHR);
+            this.Controls.Add(this.txtBGB);
+            this.Controls.Add(this.txtBGG);
+            this.Controls.Add(this.txtBGR);
             this.Controls.Add(this.pnlCellDayPreview);
             this.Controls.Add(this.pnlCellOtherPreview);
             this.Controls.Add(this.pnlCellHighlightPreview);
             this.Controls.Add(this.pnlCellBGPreview);
-            this.Controls.Add(this.cmboCellDayB);
-            this.Controls.Add(this.cmboCellDayG);
-            this.Controls.Add(this.cmboCellDayR);
-            this.Controls.Add(this.cmboCellOtherB);
-            this.Controls.Add(this.cmboCellOtherG);
-            this.Controls.Add(this.cmboCellOtherR);
-            this.Controls.Add(this.cmboCellHighlightB);
-            this.Controls.Add(this.cmboCellHighlightG);
-            this.Controls.Add(this.cmboCellHighlightR);
-            this.Controls.Add(this.cmboCellBGB);
-            this.Controls.Add(this.cmboCellBGG);
-            this.Controls.Add(this.cmboCellBGR);
             this.Controls.Add(this.lblCurrentDayColor);
             this.Controls.Add(this.lblOtherMonth);
             this.Controls.Add(this.lblColorHighlight);
@@ -320,21 +343,23 @@
         private System.Windows.Forms.Label lblColorHighlight;
         private System.Windows.Forms.Label lblOtherMonth;
         private System.Windows.Forms.Label lblCurrentDayColor;
-        private System.Windows.Forms.ComboBox cmboCellBGR;
-        private System.Windows.Forms.ComboBox cmboCellBGG;
-        private System.Windows.Forms.ComboBox cmboCellBGB;
-        private System.Windows.Forms.ComboBox cmboCellHighlightR;
-        private System.Windows.Forms.ComboBox cmboCellHighlightG;
-        private System.Windows.Forms.ComboBox cmboCellHighlightB;
-        private System.Windows.Forms.ComboBox cmboCellOtherB;
-        private System.Windows.Forms.ComboBox cmboCellOtherG;
-        private System.Windows.Forms.ComboBox cmboCellOtherR;
-        private System.Windows.Forms.ComboBox cmboCellDayB;
-        private System.Windows.Forms.ComboBox cmboCellDayG;
-        private System.Windows.Forms.ComboBox cmboCellDayR;
         private System.Windows.Forms.Panel pnlCellBGPreview;
         private System.Windows.Forms.Panel pnlCellHighlightPreview;
         private System.Windows.Forms.Panel pnlCellOtherPreview;
         private System.Windows.Forms.Panel pnlCellDayPreview;
+        private System.Windows.Forms.TextBox txtBGR;
+        private System.Windows.Forms.TextBox txtBGG;
+        private System.Windows.Forms.TextBox txtBGB;
+        private System.Windows.Forms.TextBox txtCHG;
+        private System.Windows.Forms.TextBox txtCHR;
+        private System.Windows.Forms.TextBox txtCHB;
+        private System.Windows.Forms.TextBox txtOMB;
+        private System.Windows.Forms.TextBox txtOMG;
+        private System.Windows.Forms.TextBox txtOMR;
+        private System.Windows.Forms.TextBox txtCurrentDayB;
+        private System.Windows.Forms.TextBox txtCurrentDayG;
+        private System.Windows.Forms.TextBox txtCurrentDayR;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

@@ -61,9 +61,20 @@ namespace Calendar
             syncThread.IsBackground = true;
             syncThread.Start();
 
-            dataGridView1.BackgroundColor = Settings.CellBackground;
-            dataGridView1.RowsDefaultCellStyle.SelectionBackColor = Settings.CellHighlight;
+            SetCellBackground();
+            SetSelectionColor();
 
+        }
+
+        public void SetCellBackground()
+        {
+            Color a = Color.FromArgb(255, Settings.CellBackground);
+            dataGridView1.BackgroundColor = a;
+        }
+
+        public void SetSelectionColor()
+        {
+            dataGridView1.RowsDefaultCellStyle.SelectionBackColor = Settings.CellHighlight;
         }
 
         /// <summary>
@@ -82,14 +93,16 @@ namespace Calendar
             }
         }
 
-        public void refreshAllCells()
+        public void refreshAllCells(bool loadEvents)
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 foreach (DataGridViewCalendarCell cell in row.Cells)
                 {
-                    cell.LoadEvents();
+                    if(loadEvents)
+                        cell.LoadEvents();
                     cell.Invalidate();
+
                 }
             }
         }
@@ -227,6 +240,15 @@ namespace Calendar
             
             Form settings = new SettingsFormsGeneral(persistence, user.Name);
             DialogResult result = settings.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                //update the colors
+                SetCellBackground();
+                SetSelectionColor();
+                currentCalendar.UpdateCurrentDayColor(dataGridView1);//Updates the color for the current day
+                refreshAllCells(false);
+                Settings.WriteSettings();
+            }
         }
 
         private void SyncButtonPressed(object sender, EventArgs e)
