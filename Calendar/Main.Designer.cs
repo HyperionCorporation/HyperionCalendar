@@ -62,7 +62,7 @@
             // 
             // panel1
             // 
-            this.panel1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panel1.BackColor = System.Drawing.SystemColors.HotTrack;
             this.panel1.Controls.Add(this.btnPrevMonth);
             this.panel1.Controls.Add(this.btnNextMonth);
             this.panel1.Controls.Add(this.lblMonthYear);
@@ -74,7 +74,6 @@
             // 
             // btnPrevMonth
             // 
-            this.btnPrevMonth.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnPrevMonth.Location = new System.Drawing.Point(223, 0);
             this.btnPrevMonth.Name = "btnPrevMonth";
             this.btnPrevMonth.Size = new System.Drawing.Size(75, 40);
@@ -83,10 +82,10 @@
             this.btnPrevMonth.UseCompatibleTextRendering = true;
             this.btnPrevMonth.UseVisualStyleBackColor = true;
             this.btnPrevMonth.Click += new System.EventHandler(this.btnPrevMonth_Click);
+            this.btnPrevMonth.Resize += new System.EventHandler(this.btnPrevMonth_Resize);
             // 
             // btnNextMonth
             // 
-            this.btnNextMonth.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnNextMonth.Location = new System.Drawing.Point(500, 0);
             this.btnNextMonth.Name = "btnNextMonth";
             this.btnNextMonth.Size = new System.Drawing.Size(75, 40);
@@ -97,7 +96,6 @@
             // 
             // lblMonthYear
             // 
-            this.lblMonthYear.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lblMonthYear.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMonthYear.Location = new System.Drawing.Point(304, 6);
             this.lblMonthYear.Name = "lblMonthYear";

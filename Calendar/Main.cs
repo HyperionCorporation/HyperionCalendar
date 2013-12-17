@@ -41,7 +41,7 @@ namespace Calendar
                 //Calendar starts on todays date
                 lblMonthYear.Text = getDateString(DateTime.Now);
                 user = (User)signIn.Tag;
-                currentCalendar = new Calendar(DateTime.Now, this, persistence, user);
+                currentCalendar = new Calendar(DateTime.Now, this, persistence, user, dataGridView1);
                 currentCalendar.buildDataSet(dataGridView1);
                 this.Text = "Calendar";
                 //this.Width = 933;
@@ -161,12 +161,12 @@ namespace Calendar
                            currentDate.Year == DateTime.Now.Year)
             {
                 //Put the actual date through, that way correct date is highlighted
-                currentCalendar = new Calendar(currentDate, this, persistence, user);
+                currentCalendar = new Calendar(currentDate, this, persistence, user, dataGridView1);
             }
 
             else
             {
-                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user);
+                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user, dataGridView1);
             }
 
             dataGridView1.Rows.Clear();
@@ -192,12 +192,12 @@ namespace Calendar
                 currentDate.Year == DateTime.Now.Year)
             {
                 //Put the actual date through, that way correct date is highlighted
-                currentCalendar = new Calendar(currentDate, this, persistence, user);
+                currentCalendar = new Calendar(currentDate, this, persistence, user, dataGridView1);
             }
 
             else
             {
-                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user);
+                currentCalendar = new Calendar(currentDateFirstOfMonth, this, persistence, user, dataGridView1);
             }
 
             dataGridView1.Rows.Clear();
@@ -221,18 +221,31 @@ namespace Calendar
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            dataGridView1.Height = this.Height - (this.Height / 15);
-            dataGridView1.Width = this.Width + 10;
+            
             if (currentCalendar != null)
             {
                 currentCalendar.refreshSize(dataGridView1);
             }
 
             refreshAllCells(false);
+
+            dataGridView1.Height = this.Height - ((this.Height * 4) / 20);
+            dataGridView1.Width = this.Width;
+            dataGridView1.Location = new Point(0, (this.Height * 4) / 20);
+
             panel1.Width = this.Width;
-            btnPrevMonth.Location = new Point((panel1.Width / 3), btnPrevMonth.Location.Y);
-            btnNextMonth.Location = new Point((panel1.Width / 3) * 2, btnNextMonth.Location.Y);
-            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), lblMonthYear.Location.Y);
+            panel1.Height = (this.Height * 2) / 20;
+            panel1.Location = new Point(0, (this.Height) / 20);
+            
+            btnPrevMonth.Location = new Point( (panel1.Width / 3) , panel1.Location.Y / 3);
+            btnPrevMonth.Height = (panel1.Height * 8) / 10;
+
+            btnNextMonth.Location = new Point( ((panel1.Width / 3) * 2 ), panel1.Location.Y / 3);
+            btnNextMonth.Height = (panel1.Height * 8) / 10;
+
+            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), panel1.Location.Y / 3);
+            lblMonthYear.Height = (panel1.Height * 8) / 10;
+           
             menuStrip1.Location = new Point(0, 0);
         }
 
@@ -259,6 +272,22 @@ namespace Calendar
             {
                 Thread ManualSyncThread = new Thread(new ThreadStart(sync.DoSync));
                 ManualSyncThread.Start();           
+            }
+        }
+
+        private void btnPrevMonth_Resize(object sender, EventArgs e)
+        {
+            using (var gr = btnPrevMonth.CreateGraphics())
+            {
+                Font font = btnPrevMonth.Font;
+                for (int size = (int)(btnPrevMonth.Height * 72 / gr.DpiY); size >= 8; --size)
+                {
+                    font = new Font(btnPrevMonth.Font.FontFamily, size, btnPrevMonth.Font.Style);
+                    
+                    if (TextRenderer.MeasureText(btnPrevMonth.Text, font).Width <= btnPrevMonth.ClientSize.Width) 
+                        break;
+                }
+                btnPrevMonth.Font = font;
             }
         }
 

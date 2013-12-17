@@ -14,15 +14,17 @@ namespace Calendar
         private const int numColumnsInCalendarView = 7; //7 Days in a week.
         private const int numDaysInCalendarView = 42; //A calendar will always have room for 42 days.
         private MainForm mainForm;
+        private DataGridView dataGridView1;
         private Persistence persistence;
         private User user;
 
-        public Calendar(DateTime date, MainForm mainForm, Persistence persistence, User user)
+        public Calendar(DateTime date, MainForm mainForm, Persistence persistence, User user, DataGridView dataGridView1)
         {
             this.date = date;
             this.mainForm = mainForm;
             this.persistence = persistence;
             this.user = user;
+            this.dataGridView1 = dataGridView1;
         }
 
 
@@ -84,7 +86,7 @@ namespace Calendar
 
             for (int i = 0; i < calendarView.Rows.Count; i++)
             {
-                calendarView.Rows[i].Height = mainForm.Height / 7;
+                calendarView.Rows[i].Height = dataGridView1.Height / 7;
             }
 
             shadeCalendar(calendarView);
@@ -282,7 +284,7 @@ namespace Calendar
 
             for (int i = 0; i <= 6; i++)
             {
-                calendarView.Columns[i].Width = mainForm.Width / 7;
+                calendarView.Columns[i].Width = dataGridView1.Width / 7;
                 calendarView.Columns[i].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;                
             }
 
@@ -380,11 +382,11 @@ namespace Calendar
         {
             for (int i = 0; i < calendarView.Rows.Count; i++)
             {
-                calendarView.Rows[i].Height = mainForm.Height / 7;
+                calendarView.Rows[i].Height = dataGridView1.Height / 7;
             }
             for (int i = 0; i <= 6; i++)
             {
-                calendarView.Columns[i].Width = mainForm.Width / 7;
+                calendarView.Columns[i].Width = dataGridView1.Width / 7;
                 calendarView.Columns[i].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
 
