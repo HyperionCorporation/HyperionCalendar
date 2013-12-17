@@ -20,6 +20,8 @@ namespace Calendar
         private User user;
         private DataGridView parent;
         private bool hasOverlapped;
+        private Color currentDayColor;
+        private bool isCurrentDay;
 
         public DataGridViewCalendarCell(DateTime date, Object Value, Persistence persistence, User user)
         {
@@ -35,6 +37,7 @@ namespace Calendar
             LoadEvents();
         }
 
+
         /// <summary>
         /// Loads the events from the local DB
         /// </summary>
@@ -43,6 +46,19 @@ namespace Calendar
             events.Clear();
             events = persistence.GetEvents(user, date);
         }
+
+        public Color CurrentDayColor
+        {
+            get { return currentDayColor; }
+            set { currentDayColor = value; }
+        }
+
+        public bool IsCurrentDay
+        {
+            get { return isCurrentDay; }
+            set { isCurrentDay = value; }
+        }
+
 
         protected override void Paint(Graphics graphics, Rectangle clipBounds,Rectangle cellBounds,
             int rowIndex, DataGridViewElementStates cellState, object value, object formattedValue,
@@ -75,6 +91,9 @@ namespace Calendar
                 graphics.DrawRectangle(Pens.Blue, entry.Value.rect);
                 graphics.FillRectangle(brush, entry.Value.rect);
             }
+
+            if (isCurrentDay)
+                this.Style.BackColor = currentDayColor;
             
         }
 

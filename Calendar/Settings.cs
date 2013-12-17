@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Xml;
 using System.Xml.Linq;
+using System.IO;
 
 namespace Calendar
 {
@@ -25,35 +26,61 @@ namespace Calendar
         private static string password = "EVeA53UptWrW3ehN";
         private static string database = "calendar";
 
+        private static Tuple<int,int, int, int> GetRGB(string RGB)
+        {
+            //Color [A=255, R=0, G=0, B=255]
+            string[] broken = RGB.Split(',',' ','=','[',']');
+            int Alpha = Convert.ToInt32(broken[3]);
+            int Red = Convert.ToInt32(broken[6]);
+            int Green = Convert.ToInt32(broken[9]);
+            int Blue = Convert.ToInt32(broken[12]);
+            return Tuple.Create<int,int,int,int>(Alpha,Red,Green,Blue);
+        }
+
         public static void ReadSettings()
         {
-            var doc = XDocument.Load("settings.xml");
-            var settings = doc.Descendants("Settings");
-            var serverSettings = settings.Descendants("Server");
-            var colorSettings = settings.Descendants("Colors");
-
-            foreach (XElement setting in serverSettings)
+            using (XmlReader reader = XmlReader.Create("settings.xml"))
             {
-                if (setting.Name.LocalName == "SyncInterval")
-                    SyncInterval = Convert.ToInt64(setting.Value);
-                else if (setting.Name.LocalName == "Address")
-                    address = setting.Value;
-                else if (setting.Name.LocalName == "Port")
-                    port = Convert.ToInt32(setting.Value);
-                else if (setting.Name.LocalName == "Password")
-                    password = setting.Value;
-            }
-
-            foreach (XElement setting in colorSettings)
-            {
-                if (setting.Name.LocalName == "CellBackground")
-                    cellBackground = Color.FromName(setting.Value);
-                else if (setting.Name.LocalName == "CellHighlight")
-                    cellHighlight = Color.FromName(setting.Value);
-                else if (setting.Name.LocalName == "CurrentDayColor")
-                    currentDayColor = Color.FromName(setting.Value);
-                else if (setting.Name.LocalName == "OtherMonthColor")
-                    otherMonthColor = Color.FromName(setting.Value);
+                while (reader.Read())
+                {
+                    // Only detect start elements.
+                    if (reader.NodeType == XmlNodeType.Element)
+                    {
+                        // Get element name and switch on it.
+                        Tuple<int, int, int, int> returnedValues;
+                        switch (reader.Name)
+                        {
+                            case "SyncInterval":
+                                SyncInterval = Convert.ToInt64(reader.ReadString());
+                                break;
+                            case "Address":
+                                address = reader.ReadString();
+                                break;
+                            case "Port":
+                                port = Convert.ToInt32(reader.ReadString());
+                                break;
+                            case "Password":
+                                password = reader.ReadString();
+                                break;
+                            case "CellBackground":
+                                returnedValues = GetRGB(reader.ReadString());
+                                cellBackground = Color.FromArgb(returnedValues.Item1,returnedValues.Item2,returnedValues.Item3,returnedValues.Item4);
+                                break;
+                            case "CellHighlight":
+                                returnedValues = GetRGB(reader.ReadString());
+                                cellHighlight = Color.FromArgb(returnedValues.Item1, returnedValues.Item2, returnedValues.Item3, returnedValues.Item4);
+                                break;
+                            case "CurrentDayColor":
+                                returnedValues = GetRGB(reader.ReadString());
+                                currentDayColor = Color.FromArgb(returnedValues.Item1, returnedValues.Item2, returnedValues.Item3, returnedValues.Item4);
+                                break;
+                            case "OtherMonthColor":
+                                returnedValues = GetRGB(reader.ReadString());
+                                otherMonthColor = Color.FromArgb(returnedValues.Item1, returnedValues.Item2, returnedValues.Item3, returnedValues.Item4);
+                                break;
+                        }
+                    }
+                }
             }
 
 
@@ -113,6 +140,39 @@ namespace Calendar
             set { database = value; }
         }
 
+        public static void WriteSettings()
+        {
+            File.Delete("settings.xml");
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            using (XmlWriter writer = XmlWriter.Create("settings.xml", settings))
+            {
+
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Settings");
+
+                //Server settings
+                writer.WriteStartElement("Server");
+                writer.WriteElementString("SyncInterval", Convert.ToString(SyncInterval));
+                writer.WriteElementString("Address", address);
+                writer.WriteElementString("Port", Convert.ToString(port));
+                writer.WriteElementString("Password", password);
+                writer.WriteEndElement();
+
+                //Color settings
+                writer.WriteStartElement("Colors");
+                writer.WriteElementString("CellBackground", cellBackground.ToString());
+                writer.WriteElementString("CellHighlight", cellHighlight.ToString());
+                writer.WriteElementString("CurrentDayColor", currentDayColor.ToString());
+                writer.WriteElementString("OtherMonthColor", otherMonthColor.ToString());
+                writer.WriteEndElement();
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+        }
+
+
         public static void WriteDefaultSettings()
         {
             XmlWriterSettings settings = new XmlWriterSettings();
@@ -133,10 +193,10 @@ namespace Calendar
 
                 //Color settings
                 writer.WriteStartElement("Colors");
-                writer.WriteElementString("CellBackground", cellBackground.ToString());
-                writer.WriteElementString("CellHighlight", cellHighlight.ToString());
-                writer.WriteElementString("CurrentDayColor", currentDayColor.ToString());
-                writer.WriteElementString("OtherMonthColor", otherMonthColor.ToString());
+                writer.WriteElementString("CellBackground", Convert.ToString(cellBackground.ToArgb()));
+                writer.WriteElementString("CellHighlight", Convert.ToString(cellHighlight.ToArgb()));
+                writer.WriteElementString("CurrentDayColor", Convert.ToString(currentDayColor.ToArgb()));
+                writer.WriteElementString("OtherMonthColor", Convert.ToString(otherMonthColor.ToArgb()));
                 writer.WriteEndElement();
 
                 writer.WriteEndElement();

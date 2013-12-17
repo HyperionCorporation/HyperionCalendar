@@ -300,14 +300,28 @@ namespace Calendar
                     if (dateInCell.Day == date.Day && dateInCell.Month == DateTime.Now.Month && dateInCell.Year == DateTime.Now.Year)
                     {
                         //cell.Selected = true;
-                        cell.Style.BackColor = Settings.CurrentDayColor;
+                        calCell.IsCurrentDay = true;
+                        calCell.CurrentDayColor = Settings.CurrentDayColor;
+                        //cell.Style.BackColor = Settings.CurrentDayColor;
                         break; //In case today is the first, don't want to highlight it twice
                     }
                 }
             }
 
         }
-        
+
+        public void UpdateCurrentDayColor(DataGridView calendarView)
+        {
+            foreach (DataGridViewRow row in calendarView.Rows)
+            {
+                foreach (DataGridViewCalendarCell cell in row.Cells)
+                {
+                    if (cell.IsCurrentDay)
+                        cell.CurrentDayColor = Settings.CurrentDayColor;
+                }
+            }
+
+        }
 
         //Shades all the cells of the previous and next month
         private void shadeCalendar(DataGridView calendarView)

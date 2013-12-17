@@ -1049,7 +1049,7 @@ namespace Calendar
                     localDBConnection.Close();
                 }
 
-                main.refreshAllCells(); //Cells were probably modified, so refresh them all.
+                main.refreshAllCells(true); //Cells were probably modified, so refresh them all.
             }
         }
     }
