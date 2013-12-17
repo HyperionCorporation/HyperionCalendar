@@ -166,7 +166,6 @@ namespace Calendar
                 String enteredHashedPassword = User.hashPassword(signIn.txtPassword.Text, SignIn.user.Salt)["hashedpassword"];
                 if (SignIn.user.HashedPassword == enteredHashedPassword)
                 {
-                    MessageBox.Show("Login Succesful", "Login");
                     //Cache the user
                     SignIn.persistence.FlushCache();
                     SignIn.persistence.CacheUser(SignIn.user);

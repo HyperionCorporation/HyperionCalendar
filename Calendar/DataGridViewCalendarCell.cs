@@ -84,7 +84,6 @@ namespace Calendar
             base.Paint(graphics, clipBounds, cellBounds, rowIndex, cellState,
                 value, formattedValue, errorText, cellStyle,
                 advancedBorderStyle, paintParts);
-
             if (!Sync.blockSync)
             {
                 isReadingEventList = true;
@@ -109,6 +108,12 @@ namespace Calendar
                     graphics.FillRectangle(brush, entry.Value.rect);
                 }
                 isReadingEventList = false;
+            }
+
+            else if (Sync.blockSync)
+            {
+                //Try to repaint again
+                this.Invalidate();
             }
             if (isCurrentDay)
                 this.Style.BackColor = currentDayColor;
