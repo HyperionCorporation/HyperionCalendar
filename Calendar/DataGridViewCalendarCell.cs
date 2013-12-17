@@ -93,9 +93,9 @@ namespace Calendar
                     if (!calendarEvent.Value.DeleteEvent && !calendarEvent.Value.drawn)
                     {
                         calendarEvent.Value.rect.X = cellBounds.X + 1;
-                        calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
+                        calendarEvent.Value.rect.Y = cellBounds.Y + ((cellBounds.Height * EventUtilities.TimePoint(calendarEvent.Value.begin)) / 100);
                         calendarEvent.Value.rect.Width = cellBounds.Width - 4;
-                        calendarEvent.Value.rect.Height = cellBounds.Height;// -90;
+                        calendarEvent.Value.rect.Height = cellBounds.Height / 5;// -90;
                         calendarEvent.Value.drawn = true;
 
                         checkBoxOverlap();
