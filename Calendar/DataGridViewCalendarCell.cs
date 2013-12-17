@@ -19,7 +19,7 @@ namespace Calendar
         private Persistence persistence;
         private User user;
         private DataGridView parent;
-        private bool hasOverlapped;
+        public static bool isReadingEventList; //Stops the sync thread from messing with event
         private Color currentDayColor;
         private Color otherMonthColor;
         private bool isCurrentDay;
@@ -35,7 +35,7 @@ namespace Calendar
             this.date = date;
             this.persistence = persistence;
             this.user = user;
-            this.hasOverlapped = false;
+            isReadingEventList = false;
          
             LoadEvents();
         }
@@ -85,28 +85,31 @@ namespace Calendar
                 value, formattedValue, errorText, cellStyle,
                 advancedBorderStyle, paintParts);
 
-           
-            foreach(KeyValuePair<long,Event> calendarEvent in events)
+            if (!Sync.blockSync)
             {
-                if (!calendarEvent.Value.DeleteEvent && !calendarEvent.Value.drawn)
+                isReadingEventList = true;
+                foreach (KeyValuePair<long, Event> calendarEvent in events)
                 {
-                    calendarEvent.Value.rect.X = cellBounds.X + 1;
-                    calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
-                    calendarEvent.Value.rect.Width = cellBounds.Width - 4;
-                    calendarEvent.Value.rect.Height = cellBounds.Height;// -90;
-                    calendarEvent.Value.drawn = true;
+                    if (!calendarEvent.Value.DeleteEvent && !calendarEvent.Value.drawn)
+                    {
+                        calendarEvent.Value.rect.X = cellBounds.X + 1;
+                        calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
+                        calendarEvent.Value.rect.Width = cellBounds.Width - 4;
+                        calendarEvent.Value.rect.Height = cellBounds.Height;// -90;
+                        calendarEvent.Value.drawn = true;
 
-                    checkBoxOverlap();
-                 }
+                        checkBoxOverlap();
+                    }
+                }
+
+
+                foreach (KeyValuePair<long, Event> entry in events)
+                {
+                    graphics.DrawRectangle(Pens.Blue, entry.Value.rect);
+                    graphics.FillRectangle(brush, entry.Value.rect);
+                }
+                isReadingEventList = false;
             }
-                    
-
-            foreach (KeyValuePair<long,Event> entry in events)
-            {
-                graphics.DrawRectangle(Pens.Blue, entry.Value.rect);
-                graphics.FillRectangle(brush, entry.Value.rect);
-            }
-
             if (isCurrentDay)
                 this.Style.BackColor = currentDayColor;
             else if(isOtherMonth)
@@ -292,14 +295,12 @@ namespace Calendar
                     {
                         events.OverLapped = true;
                         myEvent.OverLapped = true;
-                        this.hasOverlapped = true;
                     }
 
 
                     else if (events.Key != myEvent.Key && events.OverLapped == false)
                     {
                         events.OverLapped = false;
-                        this.hasOverlapped = false;
                     }
                 }
             }
