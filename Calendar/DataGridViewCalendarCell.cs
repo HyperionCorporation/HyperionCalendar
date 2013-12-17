@@ -24,6 +24,7 @@ namespace Calendar
         private Color otherMonthColor;
         private bool isCurrentDay;
         private bool isOtherMonth;
+        private bool isDrawing;
 
         public DataGridViewCalendarCell(DateTime date, Object Value, Persistence persistence, User user)
         {
@@ -36,6 +37,7 @@ namespace Calendar
             this.persistence = persistence;
             this.user = user;
             isReadingEventList = false;
+            isDrawing = false;
          
             LoadEvents();
         }
@@ -108,12 +110,14 @@ namespace Calendar
                     graphics.FillRectangle(brush, entry.Value.rect);
                 }
                 isReadingEventList = false;
+                isDrawing = false;
             }
 
-            else if (Sync.blockSync)
+            else if (Sync.blockSync && !isDrawing)
             {
                 //Try to repaint again
                 this.Invalidate();
+                isDrawing = true;
             }
             if (isCurrentDay)
                 this.Style.BackColor = currentDayColor;

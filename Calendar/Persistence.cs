@@ -180,8 +180,11 @@ namespace Calendar
 
         public void DoSync(User user,MainForm main)
         {
-            List<Event> eventList = sqlitePersitance.getEvents(user.UID);
-            mysqlPersitance.DoSync(eventList, user,main);
+            if (!Sync.blockSync)
+            {
+                List<Event> eventList = sqlitePersitance.getEvents(user.UID);
+                mysqlPersitance.DoSync(eventList, user, main);
+            }
         }
 
     }
