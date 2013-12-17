@@ -411,6 +411,20 @@ namespace Calendar
             }
 
         }
+        public void refreshPosition(DataGridView calendarView)
+        {
+            foreach (DataGridViewRow row in calendarView.Rows)
+            {
+                foreach (DataGridViewCalendarCell cell in row.Cells)
+                {
+                    List<Event> eventsInCell = cell.GetEventsFromCell();
+                    foreach (Event myEvent in eventsInCell)
+                    {
+                        myEvent.drawn = false;
+                    }
+                }
+            }
+        }
         
     }
 

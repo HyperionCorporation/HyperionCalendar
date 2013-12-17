@@ -227,6 +227,8 @@ namespace Calendar
                 currentCalendar.refreshSize(dataGridView1);
             }
 
+            currentCalendar.refreshPosition(dataGridView1);
+
             refreshAllCells(false);
 
             dataGridView1.Height = this.Height - ((this.Height * 4) / 20);
