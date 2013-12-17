@@ -159,12 +159,11 @@ namespace Calendar
                 writer.WriteElementString("Password", password);
                 writer.WriteEndElement();
 
-                //Color settings
                 writer.WriteStartElement("Colors");
-                writer.WriteElementString("CellBackground", cellBackground.ToString());
-                writer.WriteElementString("CellHighlight", cellHighlight.ToString());
-                writer.WriteElementString("CurrentDayColor", currentDayColor.ToString());
-                writer.WriteElementString("OtherMonthColor", otherMonthColor.ToString());
+                writer.WriteElementString("CellBackground", Convert.ToString(cellBackground.ToArgb()));
+                writer.WriteElementString("CellHighlight", Convert.ToString(cellHighlight.ToArgb()));
+                writer.WriteElementString("CurrentDayColor", Convert.ToString(currentDayColor.ToArgb()));
+                writer.WriteElementString("OtherMonthColor", Convert.ToString(otherMonthColor.ToArgb()));
                 writer.WriteEndElement();
 
                 writer.WriteEndElement();

@@ -71,10 +71,12 @@ namespace Calendar
         }
 
         /// <summary>
-        /// Checks if the user exists. 
+        /// Checks if the user exists.
         /// </summary>
         /// <param name="email">The email.</param>
-        /// <returns>The location of the user, remote or cached locally</returns>
+        /// <returns>
+        /// The location of the user, remote or cached locally
+        /// </returns>
         public Location UserExists(string email)
         {
             //Check the SQLite first to see if the user is cached. 
