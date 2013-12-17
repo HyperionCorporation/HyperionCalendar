@@ -293,6 +293,21 @@ namespace Calendar
             }
         }
 
+        private void HelpMenu_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if(item.Text == "About")
+            {
+                Form aboutMenu = new GenericHelpMenu("About", GenericHelpMenu.GenericHelpMenuType.ABOUT);
+                aboutMenu.Show();
+            }
+            else if(item.Text == "Help")
+            {
+                Form helpMenu = new GenericHelpMenu("Help",GenericHelpMenu.GenericHelpMenuType.HELP);
+                helpMenu.Show();
+            }
+        }
+
     }
 
     public class Sync
