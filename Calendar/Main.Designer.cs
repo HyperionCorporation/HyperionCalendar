@@ -62,15 +62,15 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.panel1.BackColor = System.Drawing.SystemColors.Control;
             this.panel1.Controls.Add(this.btnPrevMonth);
             this.panel1.Controls.Add(this.btnNextMonth);
             this.panel1.Controls.Add(this.lblMonthYear);
             this.panel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel1.Location = new System.Drawing.Point(0, 27);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(917, 40);
-            this.panel1.TabIndex = 1;
+            this.panel1.Size = new System.Drawing.Size(800, 40);
+            this.panel1.TabIndex = 100;
             // 
             // btnPrevMonth
             // 
@@ -170,6 +170,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
+            this.MinimumSize = new System.Drawing.Size(450, 400);
             this.Name = "MainForm";
             this.Text = "Calendar";
             this.Load += new System.EventHandler(this.MainForm_Load);
