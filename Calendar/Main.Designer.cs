@@ -49,6 +49,7 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridView1.Location = new System.Drawing.Point(0, 73);
             this.dataGridView1.Name = "dataGridView1";
@@ -56,11 +57,12 @@
             this.dataGridView1.RowHeadersWidth = 80;
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridView1.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.dataGridView1.Size = new System.Drawing.Size(994, 780);
+            this.dataGridView1.Size = new System.Drawing.Size(791, 400);
             this.dataGridView1.TabIndex = 0;
             // 
             // panel1
             // 
+            this.panel1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.panel1.Controls.Add(this.btnPrevMonth);
             this.panel1.Controls.Add(this.btnNextMonth);
             this.panel1.Controls.Add(this.lblMonthYear);
@@ -72,7 +74,8 @@
             // 
             // btnPrevMonth
             // 
-            this.btnPrevMonth.Location = new System.Drawing.Point(339, 0);
+            this.btnPrevMonth.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnPrevMonth.Location = new System.Drawing.Point(223, 0);
             this.btnPrevMonth.Name = "btnPrevMonth";
             this.btnPrevMonth.Size = new System.Drawing.Size(75, 40);
             this.btnPrevMonth.TabIndex = 2;
@@ -83,7 +86,8 @@
             // 
             // btnNextMonth
             // 
-            this.btnNextMonth.Location = new System.Drawing.Point(616, 0);
+            this.btnNextMonth.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnNextMonth.Location = new System.Drawing.Point(500, 0);
             this.btnNextMonth.Name = "btnNextMonth";
             this.btnNextMonth.Size = new System.Drawing.Size(75, 40);
             this.btnNextMonth.TabIndex = 1;
@@ -93,8 +97,9 @@
             // 
             // lblMonthYear
             // 
+            this.lblMonthYear.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lblMonthYear.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMonthYear.Location = new System.Drawing.Point(420, 0);
+            this.lblMonthYear.Location = new System.Drawing.Point(304, 6);
             this.lblMonthYear.Name = "lblMonthYear";
             this.lblMonthYear.Size = new System.Drawing.Size(190, 29);
             this.lblMonthYear.TabIndex = 0;
@@ -103,6 +108,8 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.helpToolStripMenuItem,
@@ -110,7 +117,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuStrip1.Size = new System.Drawing.Size(994, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(150, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -159,11 +166,9 @@
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(994, 742);
+            this.ClientSize = new System.Drawing.Size(784, 462);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
