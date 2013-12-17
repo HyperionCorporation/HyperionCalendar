@@ -227,7 +227,7 @@ namespace Calendar
             {
                 currentCalendar.refreshSize(dataGridView1);
             }
-            refreshAllCells();
+            refreshAllCells(false);
             panel1.Width = this.Width;
             btnPrevMonth.Location = new Point((panel1.Width / 3), btnPrevMonth.Location.Y);
             btnNextMonth.Location = new Point((panel1.Width / 3) * 2, btnNextMonth.Location.Y);

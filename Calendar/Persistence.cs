@@ -361,9 +361,10 @@ namespace Calendar
                 int key = Convert.ToInt32((long)reader["id"]);
                 return new User(name, DBEmail, hashedPassword,true, salt, key);
             }
-            catch (InvalidCastException)
+            catch (InvalidCastException e)
             {
-                //There were no rows returned, columns are null.
+                //Tere were no rows returned, columns are null.
+                string message = e.Message;
                 return null;
             }
             catch (Exception e)
