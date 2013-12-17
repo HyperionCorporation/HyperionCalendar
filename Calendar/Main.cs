@@ -26,7 +26,6 @@ namespace Calendar
         public MainForm()
         {
             InitializeComponent();
-            this.FormBorderStyle = FormBorderStyle.Fixed3D;
             //Get persistence
             persistence = new Persistence();
             
@@ -222,6 +221,15 @@ namespace Calendar
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
+            dataGridView1.Height = this.Height - (this.Height / 15);
+            dataGridView1.Width = this.Width + 10;
+            currentCalendar.refreshSize(dataGridView1);
+            refreshAllCells();
+            panel1.Width = this.Width;
+            btnPrevMonth.Location = new Point((panel1.Width / 3), btnPrevMonth.Location.Y);
+            btnNextMonth.Location = new Point((panel1.Width / 3) * 2, btnNextMonth.Location.Y);
+            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), lblMonthYear.Location.Y);
+            
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)

@@ -375,6 +375,19 @@ namespace Calendar
         {
             return calendarView.Width + " " + calendarView.Height;
         }
+        public void refreshSize(DataGridView calendarView)
+        {
+            for (int i = 0; i < calendarView.Rows.Count; i++)
+            {
+                calendarView.Rows[i].Height = mainForm.Height / 7;
+            }
+            for (int i = 0; i <= 6; i++)
+            {
+                calendarView.Columns[i].Width = mainForm.Width / 7;
+                calendarView.Columns[i].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+
+        }
         
     }
 

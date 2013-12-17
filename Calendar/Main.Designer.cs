@@ -65,9 +65,9 @@
             this.panel1.Controls.Add(this.btnNextMonth);
             this.panel1.Controls.Add(this.lblMonthYear);
             this.panel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel1.Location = new System.Drawing.Point(12, 27);
+            this.panel1.Location = new System.Drawing.Point(0, 27);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(970, 40);
+            this.panel1.Size = new System.Drawing.Size(917, 40);
             this.panel1.TabIndex = 1;
             // 
             // btnPrevMonth
@@ -163,12 +163,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(994, 750);
+            this.ClientSize = new System.Drawing.Size(994, 742);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "MainForm";
             this.Text = "Calendar";
             this.Load += new System.EventHandler(this.MainForm_Load);
