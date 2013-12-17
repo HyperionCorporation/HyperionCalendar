@@ -28,10 +28,10 @@ namespace Calendar
             InitializeComponent();
             //Get persistence
             persistence = new Persistence();
-            
 
+            sync = new Sync(persistence, null, this);
             //Get user login
-            Form signIn = new SignIn(persistence,this);
+            Form signIn = new SignIn(persistence,this,sync);
             DialogResult signInResult = signIn.ShowDialog();
             if (signInResult == DialogResult.OK)
             {
@@ -54,7 +54,7 @@ namespace Calendar
 
             AutoResetEvent autoEvent = new AutoResetEvent(false);
             sync = new Sync(persistence, user,this);
-            timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 1000, 120000);
+            timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 120000, 120000);
             syncThread = new Thread(new ThreadStart(sync.startSync));
             syncThread.Name = "SyncThread";
 
@@ -85,7 +85,7 @@ namespace Calendar
             //Check to see if the existing settings file is there. 
             if (File.Exists("settings.xml"))
             {
-                Settings.ReadSettings();
+                //Settings.ReadSettings();
             }
             else
             {
@@ -227,7 +227,7 @@ namespace Calendar
             {
                 currentCalendar.refreshSize(dataGridView1);
             }
-            refreshAllCells();
+            refreshAllCells(false);
             panel1.Width = this.Width;
             btnPrevMonth.Location = new Point((panel1.Width / 3), btnPrevMonth.Location.Y);
             btnNextMonth.Location = new Point((panel1.Width / 3) * 2, btnNextMonth.Location.Y);
@@ -280,6 +280,12 @@ namespace Calendar
             this.persistence = persistence;
             this.user = user;
             this.main = main;
+        }
+
+        public User User
+        {
+            get { return user; }
+            set { user = value; }
         }
 
         public bool IsSyncing

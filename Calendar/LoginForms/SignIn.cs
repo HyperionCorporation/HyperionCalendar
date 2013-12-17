@@ -21,8 +21,9 @@ namespace Calendar
         public static User user;
         public static BackgroundWorker bw;
         public static MainForm mainForm;
+        public Sync sync;
 
-        public SignIn(Persistence persistence,MainForm mainForm)
+        public SignIn(Persistence persistence,MainForm mainForm,Sync sync)
         {
             InitializeComponent();
             SignIn.persistence = persistence;
@@ -30,6 +31,7 @@ namespace Calendar
             this.CenterToScreen();
             SignIn.mainForm = mainForm;
             bw = new BackgroundWorker();
+            this.sync = sync;
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -161,6 +163,8 @@ namespace Calendar
                     //Cache the user
                     SignIn.persistence.FlushCache();
                     SignIn.persistence.CacheUser(SignIn.user);
+                    sync.User = SignIn.user;
+                    sync.DoSync();
                     //Tell the app that it's ok to let them in. They're cool.
                     signIn.DialogResult = DialogResult.OK;
                     signIn.Tag = SignIn.user;

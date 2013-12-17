@@ -34,10 +34,7 @@ namespace Calendar
             this.persistence = persistence;
             this.user = user;
             this.hasOverlapped = false;
-            foreach (DataGridViewColumn column in DataGridView.Columns)
-            {
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
-            }
+         
             LoadEvents();
         }
 
