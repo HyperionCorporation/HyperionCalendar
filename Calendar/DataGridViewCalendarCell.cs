@@ -21,7 +21,9 @@ namespace Calendar
         private DataGridView parent;
         private bool hasOverlapped;
         private Color currentDayColor;
+        private Color otherMonthColor;
         private bool isCurrentDay;
+        private bool isOtherMonth;
 
         public DataGridViewCalendarCell(DateTime date, Object Value, Persistence persistence, User user)
         {
@@ -54,10 +56,22 @@ namespace Calendar
             set { currentDayColor = value; }
         }
 
+        public Color OtherMonthColor
+        {
+            get { return otherMonthColor; }
+            set { otherMonthColor = value; }
+        }
+
         public bool IsCurrentDay
         {
             get { return isCurrentDay; }
             set { isCurrentDay = value; }
+        }
+
+        public bool IsOtherMonth
+        {
+            get { return isOtherMonth; }
+            set { isOtherMonth = value; }
         }
 
 
@@ -72,19 +86,19 @@ namespace Calendar
                 advancedBorderStyle, paintParts);
 
            
-                    foreach(KeyValuePair<long,Event> calendarEvent in events)
-                    {
-                        if (!calendarEvent.Value.DeleteEvent && !calendarEvent.Value.drawn)
-                        {
-                            calendarEvent.Value.rect.X = cellBounds.X + 1;
-                            calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
-                            calendarEvent.Value.rect.Width = cellBounds.Width - 4;
-                            calendarEvent.Value.rect.Height = cellBounds.Height - 90;
-                            calendarEvent.Value.drawn = true;
+            foreach(KeyValuePair<long,Event> calendarEvent in events)
+            {
+                if (!calendarEvent.Value.DeleteEvent && !calendarEvent.Value.drawn)
+                {
+                    calendarEvent.Value.rect.X = cellBounds.X + 1;
+                    calendarEvent.Value.rect.Y = cellBounds.Y + EventUtilities.TimePoint(calendarEvent.Value.begin);
+                    calendarEvent.Value.rect.Width = cellBounds.Width - 4;
+                    calendarEvent.Value.rect.Height = cellBounds.Height;// -90;
+                    calendarEvent.Value.drawn = true;
 
-                            checkBoxOverlap();
-                        }
-                    }
+                    checkBoxOverlap();
+                 }
+            }
                     
 
             foreach (KeyValuePair<long,Event> entry in events)
@@ -95,7 +109,8 @@ namespace Calendar
 
             if (isCurrentDay)
                 this.Style.BackColor = currentDayColor;
-            
+            else if(isOtherMonth)
+                this.Style.BackColor = otherMonthColor;
         }
 
         /// <summary>
@@ -253,7 +268,7 @@ namespace Calendar
                 events.Remove(modifyEvent.Key);
                 events.Add(modifyEvent.Key,modifyEvent);
                 modifyEvent.drawn = false;
-                LoadEvents();
+                //LoadEvents();
                 foreach (DataGridViewRow row in this.DataGridView.Rows)
                 {
                     foreach (DataGridViewCalendarCell cell in row.Cells)

@@ -200,9 +200,6 @@ namespace Calendar
             Preperations();
         }
 
-       
-
-
         /*
         * Checks to see if a database already exists. If it is
         * then it will make the database and tables.
@@ -229,6 +226,12 @@ namespace Calendar
             localDBConnection.Close();
         }
 
+        /// <summary>
+        /// Saves the event to the local DB
+        /// </summary>
+        /// <param name="myEvent">My event.</param>
+        /// <param name="myUser">My user.</param>
+        /// <returns></returns>
         public int SaveEvent(Event myEvent,User myUser)
         {
             string name = myEvent.name;
@@ -381,7 +384,11 @@ namespace Calendar
 
         }
 
-
+        /// <summary>
+        /// Edits the event in the local DB.
+        /// </summary>
+        /// <param name="myEvent">My event.</param>
+        /// <param name="myUser">My user.</param>
         public void EditEvent(Event myEvent, User myUser)
         {
             try
@@ -414,6 +421,9 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Flushes the user Cache.
+        /// </summary>
         public void FlushCache()
         {
             try
@@ -462,7 +472,7 @@ namespace Calendar
         }
 
         /// <summary>
-        /// Caches the in the local DB
+        /// Caches the user in the local DB
         /// </summary>
         /// <param name="user">The user.</param>
         /// <returns></returns>
@@ -697,6 +707,10 @@ namespace Calendar
             return false;
         }
 
+        /// <summary>
+        /// Checks the connection.
+        /// </summary>
+        /// <returns></returns>
         public bool CheckConnection()
         {
             return OpenConnection(connection);
@@ -772,7 +786,7 @@ namespace Calendar
         /// Does the synchronize between MySQL and SQLite
         /// </summary>
         /// <param name="eventList">The event list.</param>
-        /// <param name="uid">The uid of the current User</param>
+        /// <param name="uid">The current User</param>
         /// <param name="main">The mainProgram class</param>
         public void DoSync(List<Event> eventList, User user, MainForm main)
         {

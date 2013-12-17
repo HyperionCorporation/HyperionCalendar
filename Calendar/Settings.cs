@@ -63,26 +63,26 @@ namespace Calendar
                                 password = reader.ReadString();
                                 break;
                             case "CellBackground":
-                                returnedValues = GetRGB(reader.ReadString());
-                                cellBackground = Color.FromArgb(returnedValues.Item1,returnedValues.Item2,returnedValues.Item3,returnedValues.Item4);
+                                //returnedValues = GetRGB(reader.ReadString());
+                                cellBackground = Color.FromArgb(-1);
                                 break;
                             case "CellHighlight":
-                                returnedValues = GetRGB(reader.ReadString());
-                                cellHighlight = Color.FromArgb(returnedValues.Item1, returnedValues.Item2, returnedValues.Item3, returnedValues.Item4);
+                                //returnedValues = GetRGB(reader.ReadString());
+                                cellHighlight = Color.FromArgb(Convert.ToInt32(reader.ReadString()));
                                 break;
                             case "CurrentDayColor":
-                                returnedValues = GetRGB(reader.ReadString());
-                                currentDayColor = Color.FromArgb(returnedValues.Item1, returnedValues.Item2, returnedValues.Item3, returnedValues.Item4);
+                                //returnedValues = GetRGB(reader.ReadString());
+                                currentDayColor = Color.FromArgb(Convert.ToInt32(reader.ReadString()));
                                 break;
                             case "OtherMonthColor":
-                                returnedValues = GetRGB(reader.ReadString());
-                                otherMonthColor = Color.FromArgb(returnedValues.Item1, returnedValues.Item2, returnedValues.Item3, returnedValues.Item4);
+                                //returnedValues = GetRGB(reader.ReadString());
+                                otherMonthColor = Color.FromArgb(Convert.ToInt32(reader.ReadString()));
                                 break;
                         }
                     }
                 }
             }
-
+            
 
         }
 
@@ -160,10 +160,10 @@ namespace Calendar
                 writer.WriteEndElement();
 
                 writer.WriteStartElement("Colors");
-                writer.WriteElementString("CellBackground", Convert.ToString(cellBackground.ToArgb()));
-                writer.WriteElementString("CellHighlight", Convert.ToString(cellHighlight.ToArgb()));
-                writer.WriteElementString("CurrentDayColor", Convert.ToString(currentDayColor.ToArgb()));
-                writer.WriteElementString("OtherMonthColor", Convert.ToString(otherMonthColor.ToArgb()));
+                writer.WriteElementString("CellBackground", cellBackground.ToArgb().ToString());
+                writer.WriteElementString("CellHighlight", cellHighlight.ToArgb().ToString());
+                writer.WriteElementString("CurrentDayColor", currentDayColor.ToArgb().ToString());
+                writer.WriteElementString("OtherMonthColor", otherMonthColor.ToArgb().ToString());
                 writer.WriteEndElement();
 
                 writer.WriteEndElement();
@@ -192,10 +192,10 @@ namespace Calendar
 
                 //Color settings
                 writer.WriteStartElement("Colors");
-                writer.WriteElementString("CellBackground", Convert.ToString(cellBackground.ToArgb()));
-                writer.WriteElementString("CellHighlight", Convert.ToString(cellHighlight.ToArgb()));
-                writer.WriteElementString("CurrentDayColor", Convert.ToString(currentDayColor.ToArgb()));
-                writer.WriteElementString("OtherMonthColor", Convert.ToString(otherMonthColor.ToArgb()));
+                writer.WriteElementString("CellBackground", cellBackground.ToArgb().ToString());
+                writer.WriteElementString("CellHighlight", cellHighlight.ToArgb().ToString());
+                writer.WriteElementString("CurrentDayColor", currentDayColor.ToArgb().ToString());
+                writer.WriteElementString("OtherMonthColor", otherMonthColor.ToArgb().ToString());
                 writer.WriteEndElement();
 
                 writer.WriteEndElement();

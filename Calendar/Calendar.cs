@@ -235,7 +235,11 @@ namespace Calendar
             return fallOnNextMonth;
         }
 
-        //Determines if the day falls on the previous month or not
+        /// <summary>
+        /// Determines if the day falls on the previous month or not
+        /// </summary>
+        /// <param name="lastMonth">The last month.</param>
+        /// <returns></returns>
         private bool[] generateLastMonth(DateTime lastMonth)
         {
             int lastNumDayOfMonth = DateTime.DaysInMonth(lastMonth.Year,lastMonth.Month);
@@ -267,7 +271,10 @@ namespace Calendar
 
         }
 
-        //Sets the column's header to be the Days of the week.
+        /// <summary>
+        /// Sets the column headers.
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
         private void setColumnHeaders(DataGridView calendarView)
         {
             calendarView.ColumnCount = numColumnsInCalendarView;
@@ -290,7 +297,10 @@ namespace Calendar
 
         }
 
-        //Selects the current date in the calendar view
+        /// <summary>
+        /// Selects the current date.
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
         public void selectCurrentDate(DataGridView calendarView)
         {
             foreach (DataGridViewRow row in calendarView.Rows)
@@ -312,7 +322,11 @@ namespace Calendar
 
         }
 
-        public void UpdateCurrentDayColor(DataGridView calendarView)
+        /// <summary>
+        /// Updates the color of the cells
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
+        public void UpdateColors(DataGridView calendarView)
         {
             foreach (DataGridViewRow row in calendarView.Rows)
             {
@@ -320,6 +334,10 @@ namespace Calendar
                 {
                     if (cell.IsCurrentDay)
                         cell.CurrentDayColor = Settings.CurrentDayColor;
+                    else if (cell.IsOtherMonth)
+                        cell.OtherMonthColor = Settings.OtherMonthColor;
+                    else
+                        cell.Style.BackColor = Settings.CellBackground;
                 }
             }
 
@@ -340,30 +358,32 @@ namespace Calendar
                 {
                     //The first date in the calendar is the previous month
 
-                    DataGridViewCell cell = row.Cells[0];
+                    DataGridViewCalendarCell cell = (DataGridViewCalendarCell)row.Cells[0];
                     int currentCellDate = Convert.ToInt32((string)cell.FormattedValue);
                     int index = 0;
 
                     while (currentCellDate != 1)
                     {
-                        cell.Style.BackColor = Settings.OtherMonthColor;
+                        cell.OtherMonthColor = Settings.OtherMonthColor;
+                        cell.IsOtherMonth = true;
                         index++;
                         if (index > 6)
                             break;
-                        cell = row.Cells[index];
+                        cell = (DataGridViewCalendarCell)row.Cells[index];
                         currentCellDate = Convert.ToInt32((string)cell.FormattedValue);
                     }
                 }
 
                 else if(rowIndex > 4)
                 {
-                    foreach (DataGridViewCell cell in row.Cells)
+                    foreach (DataGridViewCalendarCell cell in row.Cells)
                     {
                         cellCount++;
                         int dateInCell = Convert.ToInt32((string)cell.FormattedValue);
                         if (dateInCell < 15)
                         {
-                            cell.Style.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+                            cell.IsOtherMonth = true;
+                            cell.OtherMonthColor = Settings.OtherMonthColor;
                         }
                     }
                 }
