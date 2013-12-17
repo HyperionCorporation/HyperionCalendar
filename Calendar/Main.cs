@@ -63,7 +63,7 @@ namespace Calendar
 
             SetCellBackground();
             SetSelectionColor();
-
+            refreshSize();
         }
 
         public void SetCellBackground()
@@ -217,38 +217,14 @@ namespace Calendar
                 Application.Exit();
             else
                 currentCalendar.selectCurrentDate(dataGridView1);
+
+            refreshSize();
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            
-            if (currentCalendar != null)
-            {
-                currentCalendar.refreshSize(dataGridView1);
-            }
-
-            currentCalendar.refreshPosition(dataGridView1);
-
-            refreshAllCells(false);
-
-            dataGridView1.Height = this.Height - ((this.Height * 4) / 20);
-            dataGridView1.Width = this.Width;
-            dataGridView1.Location = new Point(0, (this.Height * 4) / 20);
-
-            panel1.Width = this.Width;
-            panel1.Height = (this.Height * 2) / 20;
-            panel1.Location = new Point(0, (this.Height) / 20);
-            
-            btnPrevMonth.Location = new Point( (panel1.Width / 3) , panel1.Location.Y / 3);
-            btnPrevMonth.Height = (panel1.Height * 8) / 10;
-
-            btnNextMonth.Location = new Point( ((panel1.Width / 3) * 2 ), panel1.Location.Y / 3);
-            btnNextMonth.Height = (panel1.Height * 8) / 10;
-
-            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), panel1.Location.Y / 3);
-            lblMonthYear.Height = (panel1.Height * 8) / 10;
+            refreshSize();
            
-            menuStrip1.Location = new Point(0, 0);
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -285,11 +261,83 @@ namespace Calendar
                 for (int size = (int)(btnPrevMonth.Height * 72 / gr.DpiY); size >= 8; --size)
                 {
                     font = new Font(btnPrevMonth.Font.FontFamily, size, btnPrevMonth.Font.Style);
-                    
-                    if (TextRenderer.MeasureText(btnPrevMonth.Text, font).Width <= btnPrevMonth.ClientSize.Width) 
+
+                    if (TextRenderer.MeasureText(btnPrevMonth.Text, font).Width + (TextRenderer.MeasureText(btnPrevMonth.Text, font).Width/2) <= btnPrevMonth.Width) 
                         break;
                 }
                 btnPrevMonth.Font = font;
+            }
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            refreshSize();
+        }
+        private void refreshSize()
+        {
+
+            if (currentCalendar != null)
+            {
+                currentCalendar.refreshSize(dataGridView1);
+            }
+
+            currentCalendar.refreshPosition(dataGridView1);
+
+            refreshAllCells(false);
+
+            dataGridView1.Height = this.Height - ((this.Height * 4) / 20);
+            dataGridView1.Width = this.Width;
+            dataGridView1.Location = new Point(0, (this.Height * 4) / 20);
+
+            panel1.Width = this.Width;
+            panel1.Height = (this.Height * 2) / 20;
+            panel1.Location = new Point(0, (this.Height) / 20);
+
+            btnPrevMonth.Location = new Point((panel1.Width / 3), panel1.Location.Y / 3);
+            btnPrevMonth.Height = (panel1.Height * 8) / 10;
+            btnPrevMonth.Width = (this.Width * 2) / 20;
+
+            btnNextMonth.Location = new Point(((panel1.Width / 3) * 2), panel1.Location.Y / 3);
+            btnNextMonth.Height = (panel1.Height * 8) / 10;
+            btnNextMonth.Width = (this.Width * 2) / 20;
+
+            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), panel1.Location.Y / 3);
+            lblMonthYear.Height = (panel1.Height * 8) / 10;
+            lblMonthYear.Width = (this.Width * 6) / 20;
+
+            menuStrip1.Location = new Point(0, 0);
+
+        }
+
+        private void lblMonthYear_Resize(object sender, EventArgs e)
+        {
+            using (var gr = lblMonthYear.CreateGraphics())
+            {
+                Font font = lblMonthYear.Font;
+                for (int size = (int)(lblMonthYear.Height * 72 / gr.DpiY); size >= 8; --size)
+                {
+                    font = new Font(lblMonthYear.Font.FontFamily, size, lblMonthYear.Font.Style);
+
+                    if (TextRenderer.MeasureText(lblMonthYear.Text, font).Width + (TextRenderer.MeasureText(lblMonthYear.Text, font).Width / 2) <= lblMonthYear.Width)
+                        break;
+                }
+                lblMonthYear.Font = font;
+            }
+        }
+
+        private void btnNextMonth_Resize(object sender, EventArgs e)
+        {
+            using (var gr = btnNextMonth.CreateGraphics())
+            {
+                Font font = btnNextMonth.Font;
+                for (int size = (int)(btnNextMonth.Height * 72 / gr.DpiY); size >= 8; --size)
+                {
+                    font = new Font(btnNextMonth.Font.FontFamily, size, btnNextMonth.Font.Style);
+
+                    if (TextRenderer.MeasureText(btnNextMonth.Text, font).Width + (TextRenderer.MeasureText(btnNextMonth.Text, font).Width / 2) <= btnNextMonth.Width)
+                        break;
+                }
+                btnNextMonth.Font = font;
             }
         }
 

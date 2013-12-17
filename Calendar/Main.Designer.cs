@@ -93,16 +93,18 @@
             this.btnNextMonth.Text = "Next";
             this.btnNextMonth.UseVisualStyleBackColor = true;
             this.btnNextMonth.Click += new System.EventHandler(this.btnNextMonth_Click);
+            this.btnNextMonth.Resize += new System.EventHandler(this.btnNextMonth_Resize);
             // 
             // lblMonthYear
             // 
             this.lblMonthYear.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMonthYear.Location = new System.Drawing.Point(304, 6);
+            this.lblMonthYear.Location = new System.Drawing.Point(284, 6);
             this.lblMonthYear.Name = "lblMonthYear";
             this.lblMonthYear.Size = new System.Drawing.Size(190, 29);
             this.lblMonthYear.TabIndex = 0;
             this.lblMonthYear.Text = "Month-Year";
             this.lblMonthYear.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblMonthYear.Resize += new System.EventHandler(this.lblMonthYear_Resize);
             // 
             // menuStrip1
             // 
@@ -174,6 +176,7 @@
             this.Name = "MainForm";
             this.Text = "Calendar";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel1.ResumeLayout(false);
