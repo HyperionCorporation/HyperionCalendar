@@ -771,7 +771,7 @@ namespace Calendar
         /// Does the synchronize between MySQL and SQLite
         /// </summary>
         /// <param name="eventList">The event list.</param>
-        /// <param name="uid">The uid of the current User</param>
+        /// <param name="uid">The current User</param>
         /// <param name="main">The mainProgram class</param>
         public void DoSync(List<Event> eventList, User user, MainForm main)
         {
