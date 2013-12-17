@@ -22,6 +22,7 @@ namespace Calendar
         public static BackgroundWorker bw;
         public static MainForm mainForm;
         public static Sync sync;
+        private static int oldHeight;
 
         public SignIn(Persistence persistence,MainForm mainForm,Sync sync)
         {
@@ -31,7 +32,9 @@ namespace Calendar
             this.CenterToScreen();
             SignIn.mainForm = mainForm;
             bw = new BackgroundWorker();
+            this.prgsLogin.Visible = false;
             SignIn.sync = sync;
+            oldHeight = this.Height;
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -61,6 +64,8 @@ namespace Calendar
 
                 if (!bw.IsBusy)
                 {
+                    this.prgsLogin.Visible = true;
+                    this.Height = 167;
                     prgsLogin.Value = 0;
                     bw.DoWork += Login;
                     bw.WorkerReportsProgress = true;
@@ -120,6 +125,7 @@ namespace Calendar
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             btnLogin.Enabled = true;
+            this.Height = oldHeight;
             prgsLogin.Value = 0;
         }
 
@@ -145,7 +151,6 @@ namespace Calendar
 
                 if (user.HashedPassword == enteredHashedPassword)
                 {
-                    MessageBox.Show("Login Succesful", "Login");
                     return true;
                 }
                 else

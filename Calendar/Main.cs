@@ -85,7 +85,7 @@ namespace Calendar
             //Check to see if the existing settings file is there. 
             if (File.Exists("settings.xml"))
             {
-                //Settings.ReadSettings();
+                Settings.ReadSettings();
             }
             else
             {
@@ -246,7 +246,7 @@ namespace Calendar
                 //update the colors
                 SetCellBackground();
                 SetSelectionColor();
-                currentCalendar.UpdateCurrentDayColor(dataGridView1);//Updates the color for the current day
+                currentCalendar.UpdateColors(dataGridView1);//Updates the color for the current day
                 refreshAllCells(false);
                 Settings.WriteSettings();
             }
