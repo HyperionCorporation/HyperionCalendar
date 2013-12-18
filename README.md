@@ -11,6 +11,9 @@ You need to link the SQLite DLL in order to compile. It is included in the repos
 
 Calendar/System.Data.SQLite.dll
 
+You also need MySQL Adapter
+[Download Here](http://dev.mysql.com/downloads/connector/net/6.1.html)
+
 To Add the reference in Visual Studio
 
 + Right Click on Project
@@ -19,10 +22,6 @@ To Add the reference in Visual Studio
 + Click Browse on the bottom and browse to the file
 + Click OK until you're out of the dialogs
 
-###Planned Features
-
-+ Events are synced to remote database
-+ View Events with Right Click
 
 ###Currently Implemented Features
 
@@ -32,11 +31,9 @@ To Add the reference in Visual Studio
 + User information stored in local database
 + User accounts with login
 + Add events to the calendar
++ Events Sync with Remote
++ Overlapping Events are dealt with gracefully
++ Resizes Gracefully
 
 ###Bugs
 + None right now
-
-###ToDo
-+ Custom calendar cell's rectangles need work
-+ Add validity checking
-+ Commment code

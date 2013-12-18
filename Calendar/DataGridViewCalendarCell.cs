@@ -38,7 +38,6 @@ namespace Calendar
             this.user = user;
             isReadingEventList = false;
             isDrawing = false;
-         
             LoadEvents();
         }
 

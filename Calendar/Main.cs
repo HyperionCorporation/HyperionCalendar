@@ -28,7 +28,8 @@ namespace Calendar
             InitializeComponent();
             //Get persistence
             persistence = new Persistence();
-
+            btnPrevMonth.FlatStyle = FlatStyle.Flat;
+            btnNextMonth.FlatStyle = FlatStyle.Flat;
             sync = new Sync(persistence, null, this);
             //Get user login
             Form signIn = new SignIn(persistence,this,sync);
@@ -44,26 +45,24 @@ namespace Calendar
                 currentCalendar = new Calendar(DateTime.Now, this, persistence, user, dataGridView1);
                 currentCalendar.buildDataSet(dataGridView1);
                 this.Text = "Calendar";
-                //this.Width = 933;
-                //this.Height = 811;
+
+                AutoResetEvent autoEvent = new AutoResetEvent(false);
+                sync = new Sync(persistence, user, this);
+                timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 120000, 120000);
+                syncThread = new Thread(new ThreadStart(sync.startSync));
+                syncThread.Name = "SyncThread";
+
+                syncThread.IsBackground = true;
+                syncThread.Start();
+
+                SetCellBackground();
+                SetSelectionColor();
+                refreshSize();
             }
             else if (signInResult == DialogResult.Cancel)
             {
                 Application.Exit();
             }
-
-            AutoResetEvent autoEvent = new AutoResetEvent(false);
-            sync = new Sync(persistence, user,this);
-            timer = new System.Threading.Timer(sync.CheckStatus, autoEvent, 120000, 120000);
-            syncThread = new Thread(new ThreadStart(sync.startSync));
-            syncThread.Name = "SyncThread";
-
-            syncThread.IsBackground = true;
-            syncThread.Start();
-
-            SetCellBackground();
-            SetSelectionColor();
-            refreshSize();
         }
 
         public void SetCellBackground()
@@ -93,6 +92,10 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Refreshes all cells.
+        /// </summary>
+        /// <param name="loadEvents">if set to <c>true</c> [load events].</param>
         public void refreshAllCells(bool loadEvents)
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
@@ -107,6 +110,11 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Gets the date string.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <returns></returns>
         private String getDateString(DateTime date)
         {
             string month = string.Empty;
@@ -183,6 +191,11 @@ namespace Calendar
             Console.WriteLine(currentCalendar.getWidhtHeight(dataGridView1));
         }
 
+        /// <summary>
+        /// Handles the Click event of the btnPrevMonth control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void btnPrevMonth_Click(object sender, EventArgs e)
         {
             currentDate = currentDate.AddMonths(-1);
@@ -210,6 +223,11 @@ namespace Calendar
 
         }
 
+        /// <summary>
+        /// Handles the Load event of the MainForm control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void MainForm_Load(object sender, EventArgs e)
         {
             dataGridView1.ClearSelection();
@@ -221,12 +239,22 @@ namespace Calendar
             refreshSize();
         }
 
+        /// <summary>
+        /// Handles the Resize event of the MainForm control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void MainForm_Resize(object sender, EventArgs e)
         {
             refreshSize();
            
         }
 
+        /// <summary>
+        /// Handles the Click event of the settingsToolStripMenuItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             
@@ -243,6 +271,11 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Synchronizes the button pressed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void SyncButtonPressed(object sender, EventArgs e)
         {
             //Do a manual Sync
@@ -253,6 +286,11 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Handles the Resize event of the btnPrevMonth control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void btnPrevMonth_Resize(object sender, EventArgs e)
         {
             using (var gr = btnPrevMonth.CreateGraphics())
@@ -269,19 +307,27 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Handles the SizeChanged event of the MainForm control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void MainForm_SizeChanged(object sender, EventArgs e)
         {
             refreshSize();
         }
+        /// <summary>
+        /// Refreshes the size.
+        /// </summary>
         private void refreshSize()
         {
 
             if (currentCalendar != null)
             {
                 currentCalendar.refreshSize(dataGridView1);
+                currentCalendar.refreshPosition(dataGridView1);
             }
 
-            currentCalendar.refreshPosition(dataGridView1);
 
             refreshAllCells(false);
 
@@ -309,6 +355,11 @@ namespace Calendar
 
         }
 
+        /// <summary>
+        /// Handles the Resize event of the lblMonthYear control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void lblMonthYear_Resize(object sender, EventArgs e)
         {
             using (var gr = lblMonthYear.CreateGraphics())
@@ -325,6 +376,11 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Handles the Resize event of the btnNextMonth control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void btnNextMonth_Resize(object sender, EventArgs e)
         {
             using (var gr = btnNextMonth.CreateGraphics())
@@ -341,6 +397,11 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Handles the Click event of the HelpMenu control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void HelpMenu_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = sender as ToolStripMenuItem;
@@ -377,12 +438,24 @@ namespace Calendar
             this.main = main;
         }
 
+        /// <summary>
+        /// Gets or sets the user.
+        /// </summary>
+        /// <value>
+        /// The user.
+        /// </value>
         public User User
         {
             get { return user; }
             set { user = value; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether [is syncing].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [is syncing]; otherwise, <c>false</c>.
+        /// </value>
         public bool IsSyncing
         {
             get { return doSync; }
@@ -418,6 +491,10 @@ namespace Calendar
             }
         }
 
+        /// <summary>
+        /// Checks the status.
+        /// </summary>
+        /// <param name="stateInfo">The state information.</param>
         public void CheckStatus(Object stateInfo)
         {
             Console.WriteLine("Timer has ticked " + DateTime.Now.ToShortTimeString());
