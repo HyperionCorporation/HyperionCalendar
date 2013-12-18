@@ -86,7 +86,7 @@ namespace Calendar
 
             for (int i = 0; i < calendarView.Rows.Count; i++)
             {
-                calendarView.Rows[i].Height = dataGridView1.Height / 7;
+                calendarView.Rows[i].Height = (dataGridView1.Height - calendarView.Columns[0].HeaderCell.Size.Height)/ 6;
             }
 
             shadeCalendar(calendarView);
@@ -402,7 +402,7 @@ namespace Calendar
         {
             for (int i = 0; i < calendarView.Rows.Count; i++)
             {
-                calendarView.Rows[i].Height = dataGridView1.Height / 7;
+                calendarView.Rows[i].Height = (dataGridView1.Height - calendarView.Columns[0].HeaderCell.Size.Height) / 6;
             }
             for (int i = 0; i <= 6; i++)
             {
