@@ -60,6 +60,7 @@
             this.ClientSize = new System.Drawing.Size(390, 402);
             this.Controls.Add(this.rtxContent);
             this.Controls.Add(this.lblTitle);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "GenericHelpMenu";
             this.Text = "GenericHelpMenu";
             this.ResumeLayout(false);

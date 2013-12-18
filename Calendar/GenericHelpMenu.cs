@@ -17,7 +17,8 @@ namespace Calendar
         private GenericHelpMenuType type;
 
         private Assembly assembly = Assembly.GetExecutingAssembly();
-        private string resourceName = "Calendar.Text.about.rtf";
+        private string aboutFile = "Calendar.Text.about.rtf";
+        private string helpFile = "Calendar.Text.Help.rtf";
 
         public enum GenericHelpMenuType
         {
@@ -41,7 +42,7 @@ namespace Calendar
             if (type == GenericHelpMenuType.ABOUT)
             {
                 string aboutText;
-                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                using (Stream stream = assembly.GetManifestResourceStream(aboutFile))
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     aboutText = reader.ReadToEnd();
@@ -53,8 +54,14 @@ namespace Calendar
 
             else if (type == GenericHelpMenuType.HELP)
             {
-                string helpText = "Help Information Goes Here";
-                rtxContent.Text = helpText;
+                string aboutText;
+                using (Stream stream = assembly.GetManifestResourceStream(helpFile))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    aboutText = reader.ReadToEnd();
+                }
+
+                rtxContent.Rtf = aboutText;
             }
 
             else
