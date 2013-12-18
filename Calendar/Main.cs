@@ -331,25 +331,25 @@ namespace Calendar
 
             refreshAllCells(false);
 
-            dataGridView1.Height = this.Height - ((this.Height * 4) / 20);
-            dataGridView1.Width = this.Width;
-            dataGridView1.Location = new Point(0, (this.Height * 4) / 20);
+            dataGridView1.Height = this.Height - ((this.Height * 6) / 20);
+            dataGridView1.Width = (this.Width * 18) / 20;
+            dataGridView1.Location = new Point((this.Height) / 20, (this.Height * 4) / 20);
 
             panel1.Width = this.Width;
             panel1.Height = (this.Height * 2) / 20;
             panel1.Location = new Point(0, (this.Height) / 20);
 
-            btnPrevMonth.Location = new Point((panel1.Width / 3), panel1.Location.Y / 3);
-            btnPrevMonth.Height = (panel1.Height * 8) / 10;
-            btnPrevMonth.Width = (this.Width * 2) / 20;
+            btnPrevMonth.Height = (panel1.Height * 6) / 10;
+            btnPrevMonth.Width = (this.Width * 2) / 30;
+            btnPrevMonth.Location = new Point((panel1.Width / 3) - (btnPrevMonth.Width / 2), panel1.Location.Y / 3);
 
-            btnNextMonth.Location = new Point(((panel1.Width / 3) * 2), panel1.Location.Y / 3);
-            btnNextMonth.Height = (panel1.Height * 8) / 10;
-            btnNextMonth.Width = (this.Width * 2) / 20;
+            btnNextMonth.Height = (panel1.Height * 6) / 10;
+            btnNextMonth.Width = (this.Width * 2) / 30;
+            btnNextMonth.Location = new Point(((panel1.Width / 3) * 2) - (btnNextMonth.Width / 2), panel1.Location.Y / 3);
 
-            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 3), panel1.Location.Y / 3);
-            lblMonthYear.Height = (panel1.Height * 8) / 10;
-            lblMonthYear.Width = (this.Width * 6) / 20;
+            lblMonthYear.Height = (panel1.Height * 5) / 10;
+            lblMonthYear.Width = (this.Width * 5) / 20;
+            lblMonthYear.Location = new Point((panel1.Width / 2) - (lblMonthYear.Width / 2), panel1.Location.Y / 3);
 
             menuStrip1.Location = new Point(0, 0);
 
