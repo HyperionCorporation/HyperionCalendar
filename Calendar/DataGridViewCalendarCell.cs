@@ -108,6 +108,7 @@ namespace Calendar
                     graphics.DrawRectangle(Pens.Blue, entry.Value.rect);
                     graphics.FillRectangle(brush, entry.Value.rect);
                 }
+
                 isReadingEventList = false;
                 isDrawing = false;
             }

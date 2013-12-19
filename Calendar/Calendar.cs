@@ -28,6 +28,11 @@ namespace Calendar
         }
 
 
+        /// <summary>
+        /// Gets the events for month.
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
+        /// <returns></returns>
         public List<Event> GetEventsForMonth(DataGridView calendarView)
         {
             List<Event> theBigOne = new List<Event>();
@@ -93,6 +98,13 @@ namespace Calendar
 
         }
 
+        /// <summary>
+        /// Generates the last week in the calendar
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
+        /// <param name="lastOfCurrentMonth">The last of current month.</param>
+        /// <param name="currentDate">The current date.</param>
+        /// <param name="endOfMonthReached">if set to <c>true</c> [end of month reached].</param>
         private void generateLastWeek(DataGridView calendarView, DateTime lastOfCurrentMonth, int currentDate, bool endOfMonthReached)
         {
             DataGridViewRow row = new DataGridViewRow();
@@ -393,11 +405,10 @@ namespace Calendar
             }
         }
 
-        public string getWidhtHeight(DataGridView calendarView)
-        {
-            return calendarView.Width + " " + calendarView.Height;
-        }
-
+        /// <summary>
+        /// Refreshes the size of the calendar cells. 
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
         public void refreshSize(DataGridView calendarView)
         {
             for (int i = 0; i < calendarView.Rows.Count; i++)
@@ -411,6 +422,11 @@ namespace Calendar
             }
 
         }
+
+        /// <summary>
+        /// Refreshes the position of the event rectangles. 
+        /// </summary>
+        /// <param name="calendarView">The calendar view.</param>
         public void refreshPosition(DataGridView calendarView)
         {
             foreach (DataGridViewRow row in calendarView.Rows)

@@ -205,7 +205,7 @@ namespace Calendar
             else
             {
                 MessageBox.Show("Can't Connect to Remote","Connection Error");
-                }
+            }
         }
 
     }

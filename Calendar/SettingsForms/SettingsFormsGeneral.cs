@@ -103,6 +103,12 @@ namespace Calendar
 
             return true;
         }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Tag = null;
+            this.DialogResult = DialogResult.Cancel;
+        }
     }
 }
             

@@ -17,12 +17,17 @@ namespace Calendar
     {
         private Persistence persistence;
         public static BackgroundWorker bw;
+        private bool isCheckingEmail;
+        private bool userExists;
         
         public AddUser(Persistence persistence)
         {
             InitializeComponent();
             bw = new BackgroundWorker();
             this.persistence = persistence;
+            this.btnSubmit.Enabled = false;
+            isCheckingEmail = false;
+            userExists = true; //We will assume the user exists until proven otherwise.
         }
 
         private void btnSubmit_Click(object sender, EventArgs e)
@@ -54,6 +59,7 @@ namespace Calendar
             lblEmailWarn.Text = resultSet.Item1;
             lblEmailWarn.Visible = resultSet.Item2;
             btnSubmit.Enabled = resultSet.Item3;
+            isCheckingEmail = false;
         }
 
         /// <summary>
@@ -71,6 +77,7 @@ namespace Calendar
             if (persistence.UserExists(txtEmail.Text.ToString()) != StorageLocation.NULL)
             {
                 e.Result = Tuple.Create<string, bool, bool>("Name Already Exists", true, false);
+                userExists = true;
                 //lblEmailWarn.Text = "Name Already Exists";
                 //lblEmailWarn.Visible = true;
                 //btnSubmit.Enabled = false;
@@ -95,13 +102,16 @@ namespace Calendar
         //When you leave the txtEmail Box
         private void txtEmail_Leave(object sender, EventArgs e)
         {
-
-            bw.DoWork += CheckExists;
-            bw.WorkerReportsProgress = true;
-            bw.ProgressChanged += bw_ProgressChanged;
-            bw.WorkerSupportsCancellation = true;
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
-            bw.RunWorkerAsync();
+            if (!isCheckingEmail)
+            {
+                isCheckingEmail = true;
+                bw.DoWork += CheckExists;
+                bw.WorkerReportsProgress = true;
+                bw.ProgressChanged += bw_ProgressChanged;
+                bw.WorkerSupportsCancellation = true;
+                bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+                bw.RunWorkerAsync();
+            }
         }
 
         //Validate the email address
@@ -156,11 +166,16 @@ namespace Calendar
                 lblPasswdMessage.Visible = true;
             }
 
-            else
+            else if(!userExists)
             {
                 btnSubmit.Enabled = true;
                 lblPasswdMessage.Visible = false;
             }
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
         }
 
   

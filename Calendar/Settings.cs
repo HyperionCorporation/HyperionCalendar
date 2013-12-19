@@ -26,16 +26,6 @@ namespace Calendar
         private static string password = "EVeA53UptWrW3ehN";
         private static string database = "calendar";
 
-        private static Tuple<int,int, int, int> GetRGB(string RGB)
-        {
-            //Color [A=255, R=0, G=0, B=255]
-            string[] broken = RGB.Split(',',' ','=','[',']');
-            int Alpha = Convert.ToInt32(broken[3]);
-            int Red = Convert.ToInt32(broken[6]);
-            int Green = Convert.ToInt32(broken[9]);
-            int Blue = Convert.ToInt32(broken[12]);
-            return Tuple.Create<int,int,int,int>(Alpha,Red,Green,Blue);
-        }
 
         public static void ReadSettings()
         {
@@ -47,7 +37,6 @@ namespace Calendar
                     if (reader.NodeType == XmlNodeType.Element)
                     {
                         // Get element name and switch on it.
-                        Tuple<int, int, int, int> returnedValues;
                         switch (reader.Name)
                         {
                             case "SyncInterval":
