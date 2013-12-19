@@ -188,7 +188,6 @@ namespace Calendar
                 currentCalendar.selectCurrentDate(dataGridView1);
             }
 
-            Console.WriteLine(currentCalendar.getWidhtHeight(dataGridView1));
         }
 
         /// <summary>
