@@ -175,6 +175,7 @@ namespace Calendar
             else
             {
                 lblPasswdMessage.Visible = false;
+                btnSubmit.Enabled = true;
             }
         }
 

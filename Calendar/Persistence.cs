@@ -15,6 +15,7 @@ namespace Calendar
     {
         private SQLitePersistance sqlitePersitance;
         private MySQLPersistence mysqlPersitance;
+        private bool isSQLITESync;
 
         public enum Location
         {
@@ -29,6 +30,7 @@ namespace Calendar
             //Create an SQLite Persistence Object
             sqlitePersitance = new SQLitePersistance();
             mysqlPersitance = new MySQLPersistence(sqlitePersitance);
+            isSQLITESync = false;
         }
 
         /// <summary>
@@ -197,10 +199,12 @@ namespace Calendar
     {
         public static readonly string localDatabase = "calendar.sqlite";
         private SQLiteConnection localDBConnection;
+        private bool isSQLSync;
 
         public SQLitePersistance()
         {
             Preperations();
+            isSQLSync = false;
         }
 
         /*
@@ -309,9 +313,10 @@ namespace Calendar
             List<Event> eventList = new List<Event>();
 
             localDBConnection = new SQLiteConnection("Data Source=" + localDatabase + ";Version=3;");
-            if (localDBConnection.State != System.Data.ConnectionState.Open)
+            if (localDBConnection.State != System.Data.ConnectionState.Open && !Sync.blockSync && !isSQLSync)
             {
                 localDBConnection.Open();
+                isSQLSync = true;
                 SQLiteCommand cmd = localDBConnection.CreateCommand();
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = PermanentSettings.GET_EVENTS_SQLITE;
@@ -344,6 +349,7 @@ namespace Calendar
                 finally
                 {
                     localDBConnection.Close();
+                    isSQLSync = false;
                 }
 
             }
