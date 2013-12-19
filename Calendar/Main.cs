@@ -278,7 +278,7 @@ namespace Calendar
         private void SyncButtonPressed(object sender, EventArgs e)
         {
             //Do a manual Sync
-            if (!sync.IsSyncing && !DataGridViewCalendarCell.isReadingEventList)
+            if (!sync.IsSyncing && !DataGridViewCalendarCell.isReadingEventList && !persistence.sqlitePersitance.isSQLSync)
             {
                 Thread ManualSyncThread = new Thread(new ThreadStart(sync.DoSync));
                 ManualSyncThread.Start();           
