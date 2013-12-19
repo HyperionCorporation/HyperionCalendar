@@ -52,7 +52,7 @@ namespace Calendar
         /// <summary>
         /// Gets the events for a user on a date. 
         /// </summary>
-        /// <param name="user">The user.</param>
+        /// <param name="user">The user a change.</param>
         /// <param name="date">The date.</param>
         /// <returns></returns>
         public Dictionary<long,Event> GetEvents(User user, DateTime date)
@@ -65,7 +65,7 @@ namespace Calendar
                     myEvent.begin.Day == date.Day &&
                     myEvent.begin.Year == date.Year)
                 {
-                    eventDict.Add(myEvent.Key, myEvent);
+                  eventDict.Add(myEvent.Key, myEvent);
                 }
             }
 
