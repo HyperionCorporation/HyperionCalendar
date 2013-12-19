@@ -182,7 +182,7 @@ namespace Calendar
 
         public void DoSync(User user,MainForm main)
         {
-            if (!Sync.blockSync)
+            if (!Sync.blockSync && !sqlitePersitance.isSQLSync)
             {
                 List<Event> eventList = sqlitePersitance.getEvents(user.UID);
                 mysqlPersitance.DoSync(eventList, user, main);
@@ -199,7 +199,7 @@ namespace Calendar
     {
         public static readonly string localDatabase = "calendar.sqlite";
         private SQLiteConnection localDBConnection;
-        private bool isSQLSync;
+        public bool isSQLSync;
 
         public SQLitePersistance()
         {
@@ -315,8 +315,9 @@ namespace Calendar
             localDBConnection = new SQLiteConnection("Data Source=" + localDatabase + ";Version=3;");
             if (localDBConnection.State != System.Data.ConnectionState.Open && !Sync.blockSync && !isSQLSync)
             {
-                localDBConnection.Open();
                 isSQLSync = true;
+                localDBConnection.Open();
+                
                 SQLiteCommand cmd = localDBConnection.CreateCommand();
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = PermanentSettings.GET_EVENTS_SQLITE;
