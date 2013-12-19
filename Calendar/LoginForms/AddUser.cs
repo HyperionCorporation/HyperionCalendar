@@ -171,6 +171,11 @@ namespace Calendar
                 btnSubmit.Enabled = true;
                 lblPasswdMessage.Visible = false;
             }
+
+            else
+            {
+                lblPasswdMessage.Visible = false;
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

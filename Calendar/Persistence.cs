@@ -306,41 +306,47 @@ namespace Calendar
         {
             if (uid == null)
                 return null;
+            List<Event> eventList = new List<Event>();
 
             localDBConnection = new SQLiteConnection("Data Source=" + localDatabase + ";Version=3;");
-            localDBConnection.Open();
-            SQLiteCommand cmd = localDBConnection.CreateCommand();
-            cmd.CommandType = System.Data.CommandType.Text;
-            cmd.CommandText = PermanentSettings.GET_EVENTS_SQLITE;
-            cmd.Parameters.AddWithValue("@uid", uid);
-            SQLiteDataReader reader = cmd.ExecuteReader();
-            List<Event> eventList = new List<Event>();
-            try
+            if (localDBConnection.State != System.Data.ConnectionState.Open)
             {
-                while (reader.Read())
+                localDBConnection.Open();
+                SQLiteCommand cmd = localDBConnection.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = PermanentSettings.GET_EVENTS_SQLITE;
+                cmd.Parameters.AddWithValue("@uid", uid);
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                try
                 {
-                    String name = (string)reader["name"];
-                    long begintime = (long)reader["begintime"];
-                    long endtime = (long)reader["endtime"];
-                    String location = (string)reader["location"];
-                    String description = (string)reader["description"];
-                    long timeLastModified = (long)reader["timelastedit"];
-                    long key = (long)reader["uid"];
-                    bool deleteEvent = Convert.ToBoolean(reader["deleteEvent"]);
-                    eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description, key, new DateTime(timeLastModified), deleteEvent));
+                    if (reader != null)
+                    {
+                        while (reader.Read())
+                        {
+                            String name = (string)reader["name"];
+                            long begintime = (long)reader["begintime"];
+                            long endtime = (long)reader["endtime"];
+                            String location = (string)reader["location"];
+                            String description = (string)reader["description"];
+                            long timeLastModified = (long)reader["timelastedit"];
+                            long key = (long)reader["uid"];
+                            bool deleteEvent = Convert.ToBoolean(reader["deleteEvent"]);
+                            eventList.Add(new Event(name, new DateTime(begintime), new DateTime(endtime), location, description, key, new DateTime(timeLastModified), deleteEvent));
+                        }
+                    }
+
+                }
+                catch (InvalidCastException)
+                {
+                    //There were no rows returned, columns are null.
+                    return null;
+                }
+                finally
+                {
+                    localDBConnection.Close();
                 }
 
             }
-            catch (InvalidCastException)
-            {
-                //There were no rows returned, columns are null.
-                return null;
-            }
-            finally
-            {
-                localDBConnection.Close();
-            }
-
             return eventList;
         }
 
@@ -847,7 +853,7 @@ namespace Calendar
             int index = 0;
             foreach (Event localEvent in eventList)
             {
-                if (this.OpenConnection(connection) == true)
+                if (this.OpenConnection(connection) == true && lastModifiedTimes.Count != 0)
                 {
                     if (lastModifiedTimes[index].Item1 && localEvent.LastModified > lastModifiedTimes[index].Item2)
                     {
