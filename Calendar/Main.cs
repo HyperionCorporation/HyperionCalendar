@@ -483,10 +483,10 @@ namespace Calendar
         {
             if (!doSync && !DataGridViewCalendarCell.isReadingEventList)
             {
-                blockSync = true;
+                doSync = true;
                 //Make sure that there is no current sync event going on
                 persistence.DoSync(user, main);
-                blockSync = false;
+                doSync = false;
             }
         }
 
